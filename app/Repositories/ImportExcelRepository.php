@@ -32,7 +32,7 @@ class ImportExcelRepository extends Controller
               "evaluados"=>$evaluados,
               "success"=>"Solo pueden entrar Administradores"
         ];
-        if (Auth::user()->perfil != "A") {        
+        if (Auth::user()->fk_cve_perfil_usuario != "A") {        
           return view('evaluadores',$datos);          
         }
         //$data = DB::table('users')->orderBy('num_emp', 'DESC')->get();

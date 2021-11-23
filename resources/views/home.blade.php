@@ -11,8 +11,8 @@
                         </div>
                     @endif
                     <?php
-                        use App\Repositories\EvaluadoresRepository;
-                        echo (new EvaluadoresRepository())->index();             
+                        use App\Repositories\DNCRepository;
+                        echo (new DNCRepository())->index();             
                     ?>
                 </div>
             </div>

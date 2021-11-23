@@ -10,8 +10,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
-    protected $fillable = [
-        'num_emp',
+    protected $fillable = [        
         'perfil',
         'name',
         'email',
@@ -24,9 +23,6 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-    public function evaluadores () {
-        return $this->hasMany(Evaluadores::Class);
-    }
     public function perfilUser () {
         return $this->hasMany(PerfilUser::Class);
     }  

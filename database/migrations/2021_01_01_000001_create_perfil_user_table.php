@@ -13,6 +13,7 @@ class CreatePerfiluserTable extends Migration
             $table->id();
             $table->string('cve_perfil_usuario')->unique()->default("U");
             $table->string('descripcion',40)->default("USUARIO");
+            $table->boolean('activo')->default(true);
             $table->timestamps();  
             $table->softDeletes();             
             });

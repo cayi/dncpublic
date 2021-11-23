@@ -6,25 +6,25 @@ use Illuminate\Support\Facades\DB;
 
 class PeriodosSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         DB::table('periodos')->insert([            
-            'cve_periodo' => '211',
-            'descripcion' => 'PRIMER PERIODO DEL 2021',
-            'fecha_ini' => '20210101',
-            'fecha_fin' => '20210630',
+            'cve_periodo' => '200',
+            'descripcion' => 'EJERCICIO 2020',
+            'fecha_ini' => '20200101',
+            'fecha_fin' => '20201231',
         ]);
         DB::table('periodos')->insert([            
-            'cve_periodo' => '212',
-            'descripcion' => 'SEGUNDO PERIODO DEL 2021',
-            'fecha_ini' => '20210701',
+            'cve_periodo' => '210',
+            'descripcion' => 'EJERCICIO 2021',
+            'fecha_ini' => '20210101',
             'fecha_fin' => '20211231',
         ]);
+        DB::table('periodos')->insert([            
+            'cve_periodo' => '220',
+            'descripcion' => 'EJERCICIO 2022',
+            'fecha_ini' => '20220101',
+            'fecha_fin' => '20221231',
+        ]);        
     }
 }
-

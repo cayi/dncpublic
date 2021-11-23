@@ -17,12 +17,12 @@ class PeriodosController extends Controller
     public function index()
     {   
         $datos['Periodos'] = $this->periodosRepository->All();        
-        return view('Periodos.index', $datos);
+        return view('admin/Periodos.index', $datos);
     }
     public function create()
     {                
         $periodo = $this->periodosRepository->Periodo_blank();
-        return view('Periodos.create', compact('periodo'));
+        return view('admin/Periodos.create', compact('periodo'));
     }
     public function store(Request $request)
     {        
@@ -37,7 +37,7 @@ class PeriodosController extends Controller
     public function edit($id)
     {                
         $periodo = $this->periodosRepository->edit( $id);
-        return view('Periodos.edit', compact('periodo'));
+        return view('admin/Periodos.edit', compact('periodo'));
     }
     public function update(Request $request, $id)
     {   

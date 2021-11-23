@@ -16,18 +16,17 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert([
-            'num_emp' => '9999999',
-            'perfil' => 'A',
+        DB::table('users')->insert([            
+            'fk_cve_perfil_usuario' => 'A',
             'name' => 'ADMINISTRADOR DEL SISTEMA',
             'email' => 'admin@gmail.com',
             'password' => Hash::make('4dm1n'),
         ]);
-        DB::table('users')->insert([
-            'num_emp' => '26084',
-            'name' => 'BURGOS FUENTES MARIA AZUCENA',
-            'email' => 'u26084@gmail.com',
-            'password' => Hash::make('u26084'),
+        DB::table('users')->insert([    
+            'fk_cve_perfil_usuario' => 'U',
+            'name' => 'Usuario DNC 2022',
+            'email' => 'uDNC2022@gmail.com',
+            'password' => Hash::make('uDNC2022'),
         ]);
     }
 }

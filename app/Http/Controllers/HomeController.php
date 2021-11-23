@@ -13,13 +13,15 @@ class HomeController extends Controller
     }
     public function index()
     {
-        if (Auth::user()->perfil == "A") 
+        //dd("aqui");
+        if (Auth::user()->fk_cve_perfil_usuario == "A") 
         {  
            //dd("Home Admin");
            return view('homeadmin');
         }
         else
         {
+            //dd(Auth::user());
             return view('home');
         }      
     }

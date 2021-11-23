@@ -10,7 +10,7 @@
             <br>
             <font size="+2">
                 <center>
-                <strong>SISTEMA DE EVALUACIÓN DE DESEMPEÑO</strong>
+                <strong>SISTEMA FORMATO DNC 2022</strong>
                 </center>
             </font>
                 <!--
