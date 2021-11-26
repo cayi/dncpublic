@@ -33,9 +33,9 @@
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a class="nav-link" href="{{ url('/admin/Periodos')}}" > {{ __('Periodos') }}</a>
-                                <a class="nav-link" href="{{ url('/admin/Perfiluser')}}" > {{ __('Periles de Usuarios') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/Perfilusers')}}" > {{ __('Periles de Usuarios') }}</a>
                                 <a class="nav-link" href="{{ url('/admin/Usuarios')}}" > {{ __('Usuarios') }}</a>
-                                <a class="nav-link" href="{{ url('/admin/DNC')}}" >{{ __('DNC') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/Dncs')}}" >{{ __('DNC') }}</a>
                                 <a class="nav-link" href="{{ url('/admin/Dlantillas')}}" >{{ __('Plantillas') }}</a>
                              </div>
                         </li>                         

@@ -1,52 +1,49 @@
 @extends('layouts.app')
 @section('content')
+<style>
+.center {
+text-align: center
+}
+</style>
 <div class="container">
 <tr style='mso-yfti-irow:0;mso-yfti-firstrow:yes;page-break-inside:avoid;
          height:18.6pt'>  
-<strong>CONSIDERACIONES GENERALES:
+<strong>
+<p class="center">
+        SECRETARIA DE HACIENDA
+        <br>
+        SUBSECRETARÍA DE RECURSOS HUMANOS
+        <br>
+        DIRECCIÓN DE DESARROLLO ORGANIZACIONAL
+        <br>
+        CENTRO DE CAPACITACIÓN DEL GOBIERNO DEL ESTADO</p>
 </strong>
-<br>
-<br>
-<div>La evaluación del desempeño es un proceso sistemático y periódico mediante el cual los jefes inmediatos 
-<br>valoran cuantitativa y cualitativamente el grado de eficacia y eficiencia de sus colaboradores en el 
-<br>desempeño de sus puestos de trabajo. Esta técnica se basa en la observación de conductas o 
-<br>comportamientos, que se mide en relación con lo requerido para el puesto.
+<div>
+Con el propósito  de elaborar el programa ANUAL de capacitación 2022 para el personal que forma parte de la Administración Pública Estatal y buscando ofrecer nuestro servicio lo más cercano a tus necesidades de capacitación y actualización, te solicitamos completes la información que te permita mejorar tu desempeño en el puesto que actualmente desempeñan.
 <br>
 <br>
 <strong>INSTRUCCIONES:
 </strong>
 <br>
-<br>Está usted a punto de realizar la evaluación del desempeño del personal de base bajo su cargo, para lo 
-<br>cual deberá seguir los siguientes pasos:
+<br>Está usted a punto de llenar el formato de Necesidades de Capacitación para el ejercicio 2022, 
+para lo cual deberá seguir los siguientes pasos:
 <br>
-<br>&nbsp&nbsp&nbsp&nbsp1.&nbsp&nbsp<strong>Evaluar</strong>&nbsp a cada trabajador
-<br>&nbsp&nbsp&nbsp&nbsp2.&nbsp&nbsp<strong>Describir areas de oportunidad</strong>&nbsp o sugerencias de mejoras.
-<br>&nbsp&nbsp&nbsp&nbsp3.&nbsp&nbsp<strong><u>Grabar</u></strong>&nbsp los cambios para cada trabajador.
-<br>&nbsp&nbsp&nbsp&nbsp4.&nbsp&nbsp<strong>Imprimir</strong>&nbsp la evaluación.
-
-<br>&nbsp&nbsp&nbsp&nbsp5.&nbsp&nbsp<strong>Firmar</strong>&nbsp las evaluaciones retroalimentando al trabajador.
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp En caso de presentarse alguna controversia entre ambos, se deberá incluir nombre y firma del
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp representante sindical del centro de trabajo de que se trate afín de darle el trámite 
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp correspondiente.
-
-<br>&nbsp&nbsp&nbsp&nbsp6.&nbsp&nbspPodrá modificar o imprimir la evaluación las veces que considere necesario antes de enviar a 
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp validación, recuerde siempre <strong><u>grabar</u></strong> los cambios.
-
-<br>&nbsp&nbsp&nbsp&nbsp7.&nbsp&nbsp<strong>Enviar a validación</strong>, asegúrese que la calificación sea correcta para cada trabajador.
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong><u>Una vez enviada a validación no podrá hacer cambios.</u></strong>
-
-<br>&nbsp&nbsp&nbsp&nbsp8.&nbsp&nbsp<strong>Entregar</strong>&nbsp evaluaciones firmadas a su administrador o enlace de recursos humanos.
-<br>&nbsp&nbsp&nbsp&nbsp9.&nbsp&nbspEl incumplimiento de estas consideraciones generales será causa de invalidación de la 
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp evaluación o afectación. 
-
-<br>
+<br>&nbsp&nbsp&nbsp&nbsp1.&nbsp&nbsp<strong>Seleccionar</strong>&nbsp el Organismo o Dependencia a la cual esta adscrito a cada trabajador
+<br>&nbsp&nbsp&nbsp&nbsp2.&nbsp&nbsp<strong>Escribir</strong>&nbsp el número de empleado en el espacio correspondiente.
+<br>&nbsp&nbsp&nbsp&nbsp3.&nbsp&nbsp<strong>Dar clic</u></strong>&nbsp en el botón buscar.
+<br>&nbsp&nbsp&nbsp&nbsp4.&nbsp&nbsp<strong>Dar clic</strong>&nbsp en el boton Responder a la derecha de su nombre.
+<br>&nbsp&nbsp&nbsp&nbsp5.&nbsp&nbsp<strong>Llenar</strong>&nbsp el formulario.
+<br>&nbsp&nbsp&nbsp&nbsp7.&nbsp&nbsp<strong>Dar clic</strong>, en enviar formulario.
+<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Una vez enviado, le mostrará una ventana, copie el <strong>Folio</strong>
+,anote en lugar seguro el folio generado.
 <br>
 </div>
+<br>
 <td width=570 style='width:1.0cm;border:solid windowtext 1.0pt;border-bottom:solid windowtext 1.0pt;
                mso-border-top-alt:solid windowtext .5pt;mso-border-top-alt:solid windowtext .5pt;
                mso-border-bottom-alt:solid windowtext .5pt;padding:0cm 3.5pt 0cm 3.5pt;                         
                height:17.35pt'>
-        <a href='/eva2' class="btn btn-primary">Aceptar</a>        
+        <a href='/eva2' class="btn btn-primary">Continuar</a>
 </td>
 </tr>
 </div>

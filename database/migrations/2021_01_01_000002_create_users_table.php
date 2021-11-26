@@ -15,11 +15,12 @@ class CreateUsersTable extends Migration
             $table->string('email',80)->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password',80);
+            $table->boolean('activo')->default(true);
             $table->rememberToken();
             $table->timestamps();  
             $table->softDeletes(); 
             $table->foreign('fk_cve_perfil_usuario')->references('cve_perfil_usuario')->
-            on('perfil_user')->onDelete('cascade');
+            on('perfilusers')->onDelete('cascade');
             });
     }
     public function down()

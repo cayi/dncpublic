@@ -9,32 +9,27 @@
     </button>
 </div>
 @endif
-<a href="{{ url('/admin/Periodos/create') }}" class="btn btn-success"> Agregar Nuevo Periodo </a>
+<a href="{{ url('/admin/Perfilusers/create') }}" class="btn btn-success"> Agregar Nuevo Perfil de Usuario </a>
 <br>
 <br>
 <table class="table table-light">
   <thead class="thead-light">
 	<tr>
 		<th>ID</th>
-		<th>Cve de Periodo</th>
+		<th>Cve de Perfil</th>
     <th>Descripción</th>
-    <th>Fecha Inicial</th>
-    <th>Fecha Final</th>
-    <th>Activo</th>
-		<th>Acciones</th>
+    <th>Activo</th>		
 	</tr>
   </thead>
   <tbody>
-  @foreach ($Periodos as $Periodo)
+  @foreach ($Perfilusers as $Perfiluser)
 	<tr>
-		<td>{{ $Periodo->id}}</td>
-		<td>{{ $Periodo->cve_periodo}}</td>
-    <td>{{ $Periodo->descripcion}}</td>
-    <td>{{ substr($Periodo->fecha_ini,0,10)}}</td>
-    <td>{{ substr($Periodo->fecha_fin,0,10)}}</td>
+		<td>{{ $Perfiluser->id}}</td>
+		<td>{{ $Perfiluser->cve_perfil_usuario}}</td>
+    <td>{{ $Perfiluser->descripcion}}</td>    
     <td>
     <?php
-        if ($Periodo->activo) 
+        if ($Perfiluser->activo) 
         {echo " &#10004 ";
         } else 
         { 
@@ -43,10 +38,10 @@
       ?>
     </td>
 		<td>
-        <a href="{{ url('/admin/Periodos/'.$Periodo->id.'/edit') }}" class="btn btn-warning"> Editar
+        <a href="{{ url('/admin/Perfilusers/'.$Perfiluser->id.'/edit') }}" class="btn btn-warning"> Editar
         </a>
         |
-        <form action="{{ url('/admin/Periodos/'.$Periodo->id)}}" class="d-inline" method="post" enctype="multipart/form-data">
+        <form action="{{ url('/admin/Perfilusers/'.$Perfiluser->id)}}" class="d-inline" method="post" enctype="multipart/form-data">
             @csrf
             {{ method_field('DELETE') }}
             <input type="submit" onclick="return confirm('¿Quieres borrar?')" 
@@ -57,6 +52,6 @@
   @endforeach
   </tbody>
 </table>
-{!! $Periodos->links() !!}
+{!! $Perfilusers->links() !!}
 </div>
 @endsection

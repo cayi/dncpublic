@@ -4,20 +4,22 @@ namespace App\Repositories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-//use Exception;
-//use Auth;
+
 // Necesario para la clase Session
 use Session;
 use Auth;
 
-use App\Models\DNC;
+use App\Models\Dncs;
+use App\Models\Perfilusers;
+use App\Models\User;
+use App\Models\Periodos;
 
-class DNCRepository extends Controller
+class DncsRepository extends Controller
 {
     private $model;
     public function __construct()
     {        
-        $this->model = New DNC();
+        $this->model = New Dncs();
     }
     public function eva2()
     {
@@ -118,41 +120,41 @@ class DNCRepository extends Controller
             "success"=>""
         ];
         //dd("USUARIO MORTAL");
-        $dnc = DB::table('dnc')
-        ->join('periodos', 'periodos.cve_periodo', '=', 'dnc.fk_cve_periodo')
-        ->join('plantillas', 'plantillas.id', '=', 'dnc.id')
+        $dnc = DB::table('dncs')
+        ->join('periodos', 'periodos.cve_periodo', '=', 'dncs.fk_cve_periodo')
+        ->join('plantillas', 'plantillas.id', '=', 'dncs.id')
         ->orderBy('id', 'ASC')
         ->select(
-                'dnc.id',
-                'dnc.fk_cve_periodo',
-                'dnc.num_emp',
-                'dnc.nombre_completo',
-                'dnc.dep_o_ent',
-                'dnc.unidad_admva',
-                'dnc.area',
-                'dnc.grado_est',
-                'dnc.correo',
-                'dnc.telefono',
-                'dnc.funciones',
-                'dnc.word_int',
-                'dnc.word_ava',
-                'dnc.excel_int',
-                'dnc.excel_ava',
-                'dnc.power_point',
-                'dnc.nuevas_tec',
-                'dnc.acc_institucionales',
-                'dnc.acc_des_humano',
-                'dnc.acc_administrativas',
-                'dnc.otro_curso',
-                'dnc.interes_instructor',
-                'dnc.tema',
-                'dnc.activo',
+                'dncs.id',
+                'dncs.fk_cve_periodo',
+                'dncs.num_emp',
+                'dncs.nombre_completo',
+                'dncs.dep_o_ent',
+                'dncs.unidad_admva',
+                'dncs.area',
+                'dncs.grado_est',
+                'dncs.correo',
+                'dncs.telefono',
+                'dncs.funciones',
+                'dncs.word_int',
+                'dncs.word_ava',
+                'dncs.excel_int',
+                'dncs.excel_ava',
+                'dncs.power_point',
+                'dncs.nuevas_tec',
+                'dncs.acc_institucionales',
+                'dncs.acc_des_humano',
+                'dncs.acc_administrativas',
+                'dncs.otro_curso',
+                'dncs.interes_instructor',
+                'dncs.tema',
+                'dncs.activo',
                 'periodos.descripcion as periodo_descripcion',
                 'periodos.activo as periodo_activo',
                 'plantillas.activo as plantilla_activo',
                 'plantillas.puesto as plantilla_puesto'
                 )
-                ->where('dnc.activo',true)
+                ->where('dncs.activo',true)
                 ->where('periodos.activo',true)
                 ->where('plantillas.activo',true)
                 ->get();
@@ -180,6 +182,28 @@ class DNCRepository extends Controller
         ];
         $datos['success']  = "Tenga cuidado con estas opciones";
         $vista = view('administrador',$datos);
+        //$vista = "ok";
         return $vista;
+    }
+    public function perfil_usuarios()
+    {
+        return( Perfilusers::all()->SortBy('cve_perfil_usuario'));
+    }
+    public function usuarios()
+    {        
+        return( User::all()->SortBy('email'));
+    }
+    public function periodos()
+    {        
+        return( Periodos::all()->SortBy('cve_perdiodo'));
+    }
+    public function all()
+    {   
+        return( $this->model->orderBy('num_emp', 'asc')->paginate(5));
+    }
+    public function dncs_blank(){
+        $dncs = Dncs::FindOrFail(1);        
+        $dncs->activo = true;
+        return ( $dncs);
     }
 }

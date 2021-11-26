@@ -5,7 +5,7 @@ use Tests\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 
 use App\Models\User;
-use App\Models\PerfilUser;
+use App\Models\PerfilUsers;
 
 class UserTest extends TestCase
 {
@@ -14,9 +14,9 @@ class UserTest extends TestCase
         $user = new User;
         $this->assertInstanceOf(Collection::class, $user->evaluadores);        
     }    
-    public function test_a_user_has_many_perfil_user()
+    public function test_a_user_has_many_perfilusers()
     {
         $user = new User;
-        $this->assertInstanceOf(Collection::class, $user->perfilUser);
+        $this->assertInstanceOf(Collection::class, $user->perfilUsers);
     }    
 }

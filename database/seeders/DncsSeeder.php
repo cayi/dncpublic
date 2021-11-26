@@ -4,11 +4,11 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class DNCSeeder extends Seeder
+class DncsSeeder extends Seeder
 {
     public function run()
     {
-        DB::table('dnc')->insert([
+        DB::table('dncs')->insert([
             'id' => 1,
             'num_emp' => '1',
             'nombre_completo' => 'JOSE LUIS LOPEZ PEREZ',

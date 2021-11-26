@@ -11,8 +11,9 @@
                         </div>
                     @endif
                     <?php
-                        use App\Repositories\DNCRepository;
-                        echo (new DNCRepository())->index();             
+                        use App\Repositories\DncsRepository;
+                        use  App\Http\Controllers\admin\DncsController;
+                        echo (new DncsController( new DncsRepository()))->index();
                     ?>
                 </div>
             </div>

@@ -4,16 +4,11 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDNCTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
+class CreateDNCsTable extends Migration
+{   
     public function up()
     {
-        Schema::create('dnc', function (Blueprint $table) {
+        Schema::create('dncs', function (Blueprint $table) {
             $table->id();
             $table->string('fk_cve_periodo',3)->default("210");
             $table->bigInteger('num_emp');
@@ -48,6 +43,6 @@ class CreateDNCTable extends Migration
     }
     public function down()
     {
-        Schema::dropIfExists('dnc');
+        Schema::dropIfExists('dncs');
     }
 }

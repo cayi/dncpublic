@@ -42,7 +42,8 @@ Route::prefix('admin')->group(function () {
     Route::get('/import_excel', 'App\Http\Controllers\admin\ImportExcelController@index');
     Route::post('/import_excel/import', 'App\Http\Controllers\admin\ImportExcelController@import');
     Route::resource('/Periodos', App\Http\Controllers\admin\PeriodosController::class);
-    Route::resource('/Perfiluser', App\Http\Controllers\admin\PerfiluserController::class);
-    
-    
+    Route::resource('/Perfilusers', App\Http\Controllers\admin\PerfilusersController::class);
+    Route::resource('/Usuarios', App\Http\Controllers\admin\UsuariosController::class);
+    Route::resource('/Dncs', App\Http\Controllers\admin\DncsController::class);
+    Route::resource('/Plantillas', App\Http\Controllers\admin\PlantillasController::class);
 });

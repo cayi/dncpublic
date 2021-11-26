@@ -3,7 +3,7 @@
 <div class="container">
 <form action="{{ url('/admin/Periodos')}}" method="post" enctype="multipart/form-data">
 @csrf
-@include('Periodos.form',['modo'=>'Crear'])
+@include('/admin/Periodos.form',['modo'=>'Crear'])
 </form>
 </div>
 @endsection

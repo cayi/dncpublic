@@ -5,15 +5,15 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class PerfilUserSeeder extends Seeder
+class PerfilusersSeeder extends Seeder
 {    
     public function run()
     {
-        DB::table('perfil_user')->insert([
+        DB::table('perfilusers')->insert([
             'cve_perfil_usuario' => 'U',
-            'descripcion' => 'Uusario Evaluador',
+            'descripcion' => 'Usuario Normal',
         ]);
-        DB::table('perfil_user')->insert([
+        DB::table('perfilusers')->insert([
             'cve_perfil_usuario' => 'A',
             'descripcion' => 'Administrador',
         ]);
