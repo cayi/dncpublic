@@ -14,7 +14,8 @@ Se intenta utilizar las mejores practicas como son:
  
 
  NOTAS:
-
+ Es un proyecto EN DESARROLLO, algunas opciones aun no funcionan
+ para ingresar usuario admin@gmail.com contraseña admin
  NO usar giones bajos en los nombres de las tablas
  USAR la letra s al final de los nombres de las tablas (probar)
  NO usar mayusculas entre medio de los nombres de Repositorios o Modelos
