@@ -10,6 +10,7 @@ class CreateDNCsTable extends Migration
     {
         Schema::create('dncs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('fk_id_plantillas');
             $table->string('fk_cve_periodo',3)->default("210");
             $table->bigInteger('num_emp');
             //  nota los siguientes campos quedarian fuera una vez ligada a plantillas
@@ -22,22 +23,22 @@ class CreateDNCsTable extends Migration
             $table->string('correo',80);
             $table->string('telefono',40);
             $table->text('funciones');
-            $table->text('word_int');
-            $table->text('word_ava');
-            $table->text('excel_int');
-            $table->text('excel_ava');
-            $table->text('power_point');
-            $table->text('nuevas_tec');
-            $table->text('acc_institucionales');
-            $table->text('acc_des_humano');
-            $table->text('acc_administrativas');
-            $table->text('otro_curso');
-            $table->string('interes_instructor',2);
-            $table->text('tema');
+            $table->text('word_int')->nullable();
+            $table->text('word_ava')->nullable();
+            $table->text('excel_int')->nullable();
+            $table->text('excel_ava')->nullable();
+            $table->text('power_point')->nullable();
+            $table->text('nuevas_tec')->nullable();
+            $table->text('acc_institucionales')->nullable();
+            $table->text('acc_des_humano')->nullable();
+            $table->text('acc_administrativas')->nullable();
+            $table->text('otro_curso')->nullable();
+            $table->string('interes_instructor',2)->default("No");
+            $table->text('tema')->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamps();
             $table->softDeletes();
-            $table->foreign('id')->references('id')->
+            $table->foreign('fk_id_plantillas')->references('id')->
             on('plantillas')->onDelete('cascade');
         });
     }

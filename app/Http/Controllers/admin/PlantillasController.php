@@ -25,7 +25,7 @@ class PlantillasController extends Controller
         $perfil_usuarios    = $this->plantillasRepository->perfil_usuarios();
         $usuarios           = $this->plantillasRepository->usuarios();
         $periodos           = $this->plantillasRepository->periodos();
-        $datos['dncs']      = $this->plantillasRepository->all(); 
+        $datos['plantillas']      = $this->plantillasRepository->all(); 
         return view('admin/Plantillas.index', $datos, compact(
             'perfil_usuarios',
             'periodos',
@@ -36,7 +36,7 @@ class PlantillasController extends Controller
     {
         $perfil_usuarios    = $this->plantillasRepository->perfil_usuarios();
         $usuarios           = $this->plantillasRepository->usuarios();
-        $plantillas         = $this->plantillasRepository->dncs_blank();
+        $plantillas         = $this->plantillasRepository->plantillas_blank();
         return view('admin/Plantillas.create', compact(
             'usuarios',
             'perfil_usuarios',
@@ -57,7 +57,7 @@ class PlantillasController extends Controller
         $perfil_usuarios    = $this->plantillasRepository->perfil_usuarios();
         $usuarios           = $this->plantillasRepository->usuarios();
         $plantillas         = $this->plantillasRepository->edit( $id);
-        return view('admin/Dncs.edit', compact(
+        return view('admin/Plantillas.edit', compact(
             'usuarios',
             'perfil_usuarios',
             'plantillas'));

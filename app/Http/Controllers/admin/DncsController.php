@@ -39,6 +39,7 @@ class DncsController extends Controller
         $usuarios           = $this->dncsRepository->usuarios();
         $periodos           = $this->dncsRepository->periodos();
         $dncs               = $this->dncsRepository->dncs_blank();
+        //dd($dncs);
         return view('admin/Dncs.create', compact(
             'usuarios',
             'perfil_usuarios',
@@ -46,7 +47,8 @@ class DncsController extends Controller
             'dncs'));
     }
     public function store(Request $request)
-    {        
+    {    
+        //dd($request);
         $this->dncsRepository->insert( $request);
         return redirect("/admin/Dncs")->with('mensaje','Nuevo Formato DNC Agergado.');
     }

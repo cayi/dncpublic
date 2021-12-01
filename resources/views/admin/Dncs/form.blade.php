@@ -29,7 +29,6 @@
      @endforeach            
 </select>
 <br>
-
 <label  class="d-inline" for="num_emp"> Número de Empleado: </label>
 <input size="10" type="text"  class="d-inline" class="form-control" name="num_emp" id="num_emp" 
     value="{{ $dncs->num_emp }}">
@@ -42,6 +41,11 @@
 <label class="d-inline" for="dep_o_ent"> Dependencia o Entidad: </label>
 <input size="60" type="text" class="d-inline" class="form-control" name="dep_o_ent" id="dep_o_ent" 
     value="{{ $dncs->dep_o_ent }}">
+<br>
+<label class="d-inline" for="unidad_admva"> Unidad Administrativa: </label>
+<input size="60" type="text" class="d-inline" class="form-control" 
+    name="unidad_admva" id="unidad_admva" 
+    value="{{ $dncs->unidad_admva }}">
 <br>
 <label class="d-inline" for="area"> Area:</label>
 <input size="60" type="text" class="d-inline" class="form-control" name="area" id="area" 
@@ -69,266 +73,380 @@
 <label class="d-inline" for="word_int"> Word Intermedio: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="word_int_tablas" id="word_int_tablas" value="1" >
+    name="word_int_tablas" id="word_int_tablas" 
+    <?php
+        if ($dncs->word_int_tablas) echo " checked "
+    ?> >
     Tablas en Word.
 </label>
 <br>
 <label class="d-inline" for="word_ava"> Word Avanzado: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="word_ava_correspondencia" id="word_ava_correspondencia" value="1" >
+    name="word_ava_correspondencia" id="word_ava_correspondencia" 
+    <?php
+        if ($dncs->word_ava_correspondencia) echo " checked "
+    ?> >
     Combinación de Correspondencia.
 </label>
 <br>
 <label class="d-inline" for="excel_int"> Excel Intermedio: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="excel_int_graficos" id="excel_int_graficos" value="1" >
+    name="excel_int_graficos" id="excel_int_graficos" 
+    <?php
+        if ($dncs->excel_int_graficos) echo " checked "
+    ?> >
     Gráficos en Excel.
 </label>
 <br>
 <?php for ($i = 1; $i <= 30; $i++) {     echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">    
     <input type="checkbox" class="form-check-input "
-    name="excel_int_formulas" id="excel_int_formulas" value="1" >
+    name="excel_int_formulas" id="excel_int_formulas" 
+    <?php
+        if ($dncs->excel_int_formulas) echo " checked "
+    ?> >
     Formulas Básicas en Excel.
 </label>
 <br>
 <label class="d-inline" for="excel_ava"> Excel Avanzado: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="excel_ava_herramientas" id="excel_ava_herramientas" value="1" >
+    name="excel_ava_herramientas" id="excel_ava_herramientas" 
+    <?php
+        if ($dncs->excel_ava_herramientas) echo " checked "
+    ?> >
     Herramientas de visualización de datos.
 </label>
 <br>
 <?php for ($i = 1; $i <= 29; $i++) {     echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="excel_ava_herramientas" id="excel_ava_herramientas" value="1" >
+    name="excel_ava_funciones" id="excel_ava_funciones" 
+    <?php
+        if ($dncs->excel_ava_funciones) echo " checked "
+    ?> >
     Funciones y herramientas avanzadas.
 </label>
 <br>
 <label class="d-inline" for="power_point"> Power Point: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="power_point_cualidades" id="power_point_cualidades" value="1" >
-    La cualidades de la Presentaciones.
+    name="power_point_cualidades" id="power_point_cualidades" 
+    <?php
+        if ($dncs->power_point_cualidades) echo " checked "
+    ?> >
+    Las Cualidades de la Presentaciones.
 </label>
 <br>
 <label class="d-inline" ffor="nuevas_tec"> Nuevas Tecnologías: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="nuevas_tec_competencia" id="nuevas_tec_competencia" value="1" >
+    name="nuevas_tec_competencia" id="nuevas_tec_competencia" 
+    <?php
+        if ($dncs->nuevas_tec_competencia) echo " checked "
+    ?> >
     Competencia comunicativa a través de la competencia digital.
 </label>
 <br>
 <?php for ($i = 1; $i <= 36; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="nuevas_tec_zoom" id="nuevas_tec_zoom" value="1" >
+    name="nuevas_tec_zoom" id="nuevas_tec_zoom" 
+    <?php
+        if ($dncs->nuevas_tec_zoom) echo " checked "
+    ?> >
     Nuevas tecnologías (zoom).
 </label>
 <br>
 <label for="acc_institucionales"> ACCIONES INSTITUCIONALES: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_etica" id="acc_institucionales_etica" value="1" >
+    name="acc_institucionales_etica" id="acc_institucionales_etica" 
+    <?php
+        if ($dncs->acc_institucionales_etica) echo " checked "
+    ?>>
     Ética e Integridad en el Servicio Público.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_valores" id="acc_institucionales_valores" value="1" >
+    name="acc_institucionales_valores" id="acc_institucionales_valores" 
+    <?php
+        if ($dncs->acc_institucionales_valores) echo " checked "
+    ?> >
     Valores Gubernamentales.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_responsabilidades" id="acc_institucionales_responsabilidades" value="1" >
+    name="acc_institucionales_responsabilidades" id="acc_institucionales_responsabilidades" 
+    <?php
+        if ($dncs->acc_institucionales_responsabilidades) echo " checked "
+    ?>>
     Responsabilidades Administrativas de las personas servidoras públicas.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_metodologia" id="acc_institucionales_metodologia" value="1" >
+    name="acc_institucionales_metodologia" id="acc_institucionales_metodologia" 
+    <?php
+        if ($dncs->acc_institucionales_metodologia) echo " checked "
+    ?> >
     Metodología de las 5´s.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_identificacion" id="acc_institucionales_identificacion" value="1" >
+    name="acc_institucionales_identificacion" id="acc_institucionales_identificacion" 
+    <?php
+        if ($dncs->acc_institucionales_identificacion) echo " checked "
+    ?> >
     Identificación Institucional.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_violencia" id="acc_institucionales_violencia" value="1" >
+    name="acc_institucionales_violencia" id="acc_institucionales_violencia" 
+    <?php
+        if ($dncs->acc_institucionales_violencia) echo " checked "
+    ?>>
     Violencia ver, conocer y reconocer.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_seguridad" id="acc_institucionales_seguridad" value="1" >
+    name="acc_institucionales_seguridad" id="acc_institucionales_seguridad" 
+    <?php
+        if ($dncs->acc_institucionales_seguridad) echo " checked "
+    ?> >
     Seguridad con perspectiva de género.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_norma" id="acc_institucionales_norma" value="1" >
+    name="acc_institucionales_norma" id="acc_institucionales_norma" 
+    <?php
+        if ($dncs->acc_institucionales_norma) echo " checked "
+    ?> >
     Norma 025.Igualdad laboral.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_induccion" id="acc_institucionales_induccion" value="1" >
+    name="acc_institucionales_induccion" id="acc_institucionales_induccion" 
+    <?php
+        if ($dncs->acc_institucionales_induccion) echo " checked "
+    ?> >
     Inducción al Servicio Público.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_actualizacion" id="acc_institucionales_actualizacion" value="1" >
+    name="acc_institucionales_actualizacion" id="acc_institucionales_actualizacion" 
+    <?php
+        if ($dncs->acc_institucionales_actualizacion) echo " checked "
+    ?> >
     Actualización en Gestión archivística, un camino hacia la transparencia y rendición de cuentas.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_documentos" id="acc_institucionales_documentos" value="1" >
+    name="acc_institucionales_documentos" id="acc_institucionales_documentos" 
+    <?php
+        if ($dncs->acc_institucionales_documentos) echo " checked "
+    ?> >
     Documentos Administrativos.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_politicas" id="acc_institucionales_politicas" value="1" >
+    name="acc_institucionales_politicas" id="acc_institucionales_politicas" 
+    <?php
+        if ($dncs->acc_institucionales_politicas) echo " checked "
+    ?> >
     Políticas públicas y el Ciudadano.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_correcto" id="acc_institucionales_correcto" value="1" >
+    name="acc_institucionales_correcto" id="acc_institucionales_correcto" 
+    <?php
+        if ($dncs->acc_institucionales_correcto) echo " checked "
+    ?> >
     Correcto manejo de Información.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_protocolos" id="acc_institucionales_protocolos" value="1" >
+    name="acc_institucionales_protocolos" id="acc_institucionales_protocolos" 
+    <?php
+        if ($dncs->acc_institucionales_protocolos) echo " checked "
+    ?> >
     Protocolos de Atención y Servicio.
 </label>
 <br>
 <?php for ($i = 1; $i <= 56; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_institucionales_vocacion" id="acc_institucionales_vocacion" value="1" >
+    name="acc_institucionales_vocacion" id="acc_institucionales_vocacion" 
+    <?php
+        if ($dncs->acc_institucionales_vocacion) echo " checked "
+    ?> >
     Vocación de Servicio.
 </label>
 <br>
 <label for="acc_des_humano">ACCIONES DE DESARROLLO HUMANO:</label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_des_humano_solucion" id="acc_des_humano_solucion" value="1" >
+    name="acc_des_humano_solucion" id="acc_des_humano_solucion" 
+    <?php
+        if ($dncs->acc_des_humano_solucion) echo " checked "
+    ?> >
     Solución de conflictos.
 </label>
 <br>
 <?php for ($i = 1; $i <= 72; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_des_humano_como" id="acc_des_humano_como" value="1" >
+    name="acc_des_humano_como" id="acc_des_humano_como" 
+    <?php
+        if ($dncs->acc_des_humano_como) echo " checked "
+    ?> >
     Como afrontar las dificultades laborales.
 </label>
 <br>
 <?php for ($i = 1; $i <= 72; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_des_humano_comunicacion" id="acc_des_humano_comunicacion" value="1" >
+    name="acc_des_humano_comunicacion" id="acc_des_humano_comunicacion" 
+    <?php
+        if ($dncs->acc_des_humano_comunicacion) echo " checked "
+    ?> >
     Comunicación consciente.
 </label>
 <br>
 <?php for ($i = 1; $i <= 72; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_des_humano_importancia" id="acc_des_humano_importancia" value="1" >
+    name="acc_des_humano_importancia" id="acc_des_humano_importancia" 
+    <?php
+        if ($dncs->acc_des_humano_importancia) echo " checked "
+    ?> >
     La importancia de aceptarse a sí mismos.
 </label>
 <br>
 <?php for ($i = 1; $i <= 72; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_des_humano_inteligencia" id="acc_des_humano_inteligencia" value="1" >
+    name="acc_des_humano_inteligencia" id="acc_des_humano_inteligencia" 
+    <?php
+        if ($dncs->acc_des_humano_importancia) echo " checked "
+    ?> >
     Inteligencia emocional.
 </label>
 <br>
 <label for="acc_administrativas">ACCIONES ADMINISTRATIVAS:</label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_actualizacion" id="acc_administrativas_actualizacion" value="1" >
-    Actualización de procedimientos, Mejora Continua.    
+    name="acc_administrativas_actualizacion" id="acc_administrativas_actualizacion" 
+    <?php
+        if ($dncs->acc_administrativas_actualizacion) echo " checked "
+    ?> >
+    Actualización de procedimientos, Mejora Continua.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_cumplimiento" id="acc_administrativas_cumplimiento" value="1" >
+    name="acc_administrativas_cumplimiento" id="acc_administrativas_cumplimiento" 
+    <?php
+        if ($dncs->acc_administrativas_cumplimiento) echo " checked "
+    ?> >
     Cumplimiento de objetivos y metas Institucionales.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_administracion" id="acc_administrativas_administracion" value="1" >
+    name="acc_administrativas_administracion" id="acc_administrativas_administracion" 
+    <?php
+        if ($dncs->acc_administrativas_administracion) echo " checked "
+    ?> >
     Administración efectiva del tiempo.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_clima" id="acc_administrativas_clima" value="1" >
+    name="acc_administrativas_clima" id="acc_administrativas_clima" 
+    <?php
+        if ($dncs->acc_administrativas_clima) echo " checked "
+    ?> >
     Clima laboral.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_modernizacion" id="acc_administrativas_modernizacion" value="1" >
+    name="acc_administrativas_modernizacion" id="acc_administrativas_modernizacion" 
+    <?php
+        if ($dncs->acc_administrativas_modernizacion) echo " checked "
+    ?> >
     Modernización administrativa y diseño organizacional.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_recursos" id="acc_administrativas_recursos" value="1" >
+    name="acc_administrativas_recursos" id="acc_administrativas_recursos" 
+    <?php
+        if ($dncs->acc_administrativas_recursos) echo " checked "
+    ?> >
     Administración de recursos humanos.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_materiales" id="acc_administrativas_materiales" value="1" >
+    name="acc_administrativas_materiales" id="acc_administrativas_materiales" 
+    <?php
+        if ($dncs->acc_administrativas_materiales) echo " checked "
+    ?> >
     Administración de recursos materiales.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_sistema" id="acc_administrativas_sistema" value="1" >
+    name="acc_administrativas_sistema" id="acc_administrativas_sistema" 
+    <?php
+        if ($dncs->acc_administrativas_sistema) echo " checked "
+    ?> >
     Sistema de calidad.
 </label>
 <br>
 <?php for ($i = 1; $i <= 57; $i++) { echo '&nbsp'; } ?>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
-    name="acc_administrativas_otro" id="acc_administrativas_otro" value="1" >
+    name="acc_administrativas_otro" id="acc_administrativas_otro" 
+    <?php
+        if ($dncs->acc_administrativas_otro) echo " checked "
+    ?> >
     Otro.
 </label>
 <br>
@@ -359,5 +477,6 @@
 <a href="{{ url('/admin/Dncs') }}" class="btn btn-primary"  > Regresar </a>
 <br>
 <input type="hidden" id="activao" name= "activao" value="{{ $dncs->activo }}">
+<input type="hidden" id="fk_id_plantillas" name= "fk_id_plantillas" value="{{ $dncs->fk_id_plantillas }}">
 </div>
 @include('include.jsactiva')

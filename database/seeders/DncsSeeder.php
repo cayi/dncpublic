@@ -9,7 +9,7 @@ class DncsSeeder extends Seeder
     public function run()
     {
         DB::table('dncs')->insert([
-            'id' => 1,
+            'fk_id_plantillas' => 1,
             'num_emp' => '1',
             'nombre_completo' => 'JOSE LUIS LOPEZ PEREZ',
             'dep_o_ent' => 'SECRETARIA DE SEGURIDAD PUBLICA',

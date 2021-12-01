@@ -21,95 +21,6 @@ class DncsRepository extends Controller
     {        
         $this->model = New Dncs();
     }
-    public function eva2()
-    {
-        //dd(Auth::user());
-        Session::pull('mensaje');
-        Session::pull('filter');
-        $evaluados = DB::table('evaluados')
-                 ->where('fk_ne_jefe', Auth::user()->num_emp)
-                 ->orderBy('id')
-                 ->get();
-        $evaluador = DB::table('evaluadores')
-                 ->join('periodos', 'periodos.cve_periodo', '=', 'evaluadores.fk_cve_periodo_ultimo')
-                 ->join('areas', 'areas.cve_area', '=', 'evaluadores.fk_cve_area')
-                 ->join('unidades', 'unidades.cve_unidad', '=', 'areas.fk_cve_unidad')
-                 ->join('dependencias', 'dependencias.cve_dependencia', '=', 'unidades.fk_cve_dependencia')
-                 ->join('tipo_dependencia', 'tipo_dependencia.cve_tipo_dependencia', '=', 'dependencias.fk_cve_tipo_dependencia')
-                 ->orderBy('id', 'ASC')
-                 ->select(
-                     'evaluadores.id',
-                     'evaluadores.fk_cve_periodo_ultimo',
-                     'evaluadores.ne_jefe',
-                     'evaluadores.tot_evaluar',
-                     'evaluadores.tot_evaluado',
-                     'evaluadores.pen_evaluar',
-                     'evaluadores.puesto',
-                     'evaluadores.fk_cve_area',
-                     'areas.descripcion as area',
-                     'areas.activa as area_activa',
-                     'unidades.descripcion as unidad_admva',
-                     'unidades.activa as unidad_admva_activa',
-                     'dependencias.descripcion as dependencia',
-                     'dependencias.activa as dependencia_activa',
-                     'tipo_dependencia.descripcion as tipo_dependencia')
-                 ->where('ne_jefe', Auth::user()->num_emp)->get();
-        $success = false;
-        if ($evaluador->isEmpty()) 
-             {
-                 $success = "Error, El usuario No. ".Auth::user()->num_emp." no existe ers.index().";
-             };
-        $tot_evaluar = 0;
-        $pen_evaluar = 0;
-        // debe entrar una sola vez a este ciclo, solo un registro se extrae
-        foreach($evaluador as $evalr) 
-             {
-                 $tot_evaluar = $evalr->tot_evaluar;
-                 $pen_evaluar = $evalr->pen_evaluar;
-        };
-        if($pen_evaluar == "0") 
-             {
-                 $success = "Usted ya no tiene empleados por evaluar.";
-             } else 
-             {
-                 $success = "Usted tiene ". $tot_evaluar.
-                     " empleados asignados y le quedan ". $pen_evaluar. " por evaluar.";
-        };
-        $datos=[
-                 "usuario"=>Auth::user()->name,
-                 "cve_perfil_usuario"=>Auth::user()->cve_perfil_usuario,
-                 "email"=>Auth::user()->email,
-                 "numeroEmpleado"=>Auth::user()->num_emp,
-                 "evaluados"=>$evaluados,
-                 "success"=>$success
-             ];
-        //dd($datos);
-        // es administrador?
-        if (Auth::user()->fk_cve_perfil_usuario == "A") 
-             { 
-                 $datos['success']  = "Tenga cuidado con estas opciones";
-                return view('administrador',$datos);
-        }
-        else
-        {
-            foreach($evaluador as $evalr) 
-                 {
-                     if($evalr->area_activa &&
-                        $evalr->unidad_admva_activa  &&
-                        $evalr->dependencia_activa ) 
-                     {
-                         //dd($evaluador);
-                         //dd("USUARIO MORTAL");
-                         return view('evaluadores',$datos);
-                     } else
-                     {
-                         //dd($evalr);
-                         $datos['cve_area'] = $evalr->fk_cve_area;                        
-                         return view('inactivo',$datos);
-                     }
-                 }                
-        };
-    }
     // completa la vista del Usuario normal Evaluador!!
     public function index()
     {
@@ -205,5 +116,407 @@ class DncsRepository extends Controller
         $dncs = Dncs::FindOrFail(1);        
         $dncs->activo = true;
         return ( $dncs);
+    }
+    public function insert( Request $request)
+    {
+        $campos=        $this->get_campos_val();
+        $mensajes=      $this->get_mensajes_val();
+        //dd($request);
+        $this->validate( $request, $campos, $mensajes);
+        $dncs= $this->fix_datos_dncs( $request);
+        //dd( $dncs);
+        $this->model->insert( $dncs);
+    }
+    private function fix_datos_dncs( $request) 
+    {
+        // elimina la variables _token , _method, y activao
+        $datos_dncs = request()->except('_token', '_method', "activao","activa");
+        $datos_dncs['activo'] = filter_var($request->activao, FILTER_VALIDATE_BOOLEAN);            
+        $datos_dncs['word_int']= "";
+        $datos_dncs['word_ava']= "";
+        $datos_dncs['excel_int']= "";
+        $datos_dncs['excel_ava']= "";
+        $datos_dncs['power_point']= "";
+        $datos_dncs['nuevas_tec']= "";
+        $datos_dncs['acc_institucionales']= "";
+        $datos_dncs['acc_des_humano']= "";
+        $datos_dncs['acc_administrativas']= "";        
+        if (array_key_exists('word_int_tablas', $datos_dncs)) {
+            $datos_dncs['word_int'] = "Tablas en Word.";
+            unset($datos_dncs['word_int_tablas']);
+        };
+        if (array_key_exists('word_ava_correspondencia',$datos_dncs) ) {
+            $datos_dncs['word_ava'] = "Combinación de Correspondencia.";
+            unset($datos_dncs['word_ava_correspondencia']);
+        };
+        if (array_key_exists('excel_int_graficos',$datos_dncs)) {
+            $datos_dncs['excel_int'] = "Gráficos en Excel.";
+            unset($datos_dncs['excel_int_graficos']);
+        };
+        if (array_key_exists('excel_int_formulas',$datos_dncs)) {
+            $datos_dncs['excel_int'] = $datos_dncs['excel_int']."\r\n".
+            "Formulas Básicas en Excel.";
+            unset($datos_dncs['excel_int_formulas']);
+        };
+        if (array_key_exists('excel_ava_herramientas',$datos_dncs)) {
+            $datos_dncs['excel_ava'] = "Herramientas de visualización de datos.";
+            unset($datos_dncs['excel_ava_herramientas']);
+        };
+        if (array_key_exists('excel_ava_funciones',$datos_dncs)) {
+            $datos_dncs['excel_ava'] = $datos_dncs['excel_ava']."\r\n".
+            "Funciones y herramientas avanzadas.";
+            unset($datos_dncs['excel_ava_funciones']);
+        };
+        if (array_key_exists('power_point_cualidades',$datos_dncs)) {
+            $datos_dncs['power_point'] = "La cualidades de la Presentaciones.";
+            unset($datos_dncs['power_point_cualidades']);
+        };
+        if (array_key_exists('nuevas_tec_competencia',$datos_dncs)) {
+            $datos_dncs['nuevas_tec'] = "Competencia comunicativa a través de la competencia digital.";
+            unset($datos_dncs['nuevas_tec_competencia']);
+        };
+        if (array_key_exists('nuevas_tec_zoom',$datos_dncs)) {
+            $datos_dncs['nuevas_tec'] = $datos_dncs['nuevas_tec']."\r\n".
+            "Nuevas tecnologías (zoom).";
+            unset($datos_dncs['nuevas_tec_zoom']);
+        };
+        if (array_key_exists('acc_institucionales_etica',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = "Ética e Integridad en el Servicio Público.";
+            unset($datos_dncs['acc_institucionales_etica']);
+        };
+        if (array_key_exists('acc_institucionales_valores',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Valores Gubernamentales.";
+            unset($datos_dncs['acc_institucionales_valores']);
+        };
+        if (array_key_exists('acc_institucionales_responsabilidades',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Responsabilidades Administrativas de las personas servidoras públicas.";
+            unset($datos_dncs['acc_institucionales_responsabilidades']);
+        };
+        if (array_key_exists('acc_institucionales_metodologia',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Metodología de las 5´s.";
+            unset($datos_dncs['acc_institucionales_metodologia']);
+        };
+        if (array_key_exists('acc_institucionales_identificacion',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Identificación Institucional.";
+            unset($datos_dncs['acc_institucionales_identificacion']);
+        };
+        if (array_key_exists('acc_institucionales_violencia',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Violencia ver, conocer y reconocer.";
+            unset($datos_dncs['acc_institucionales_violencia']);
+        };
+        if (array_key_exists('acc_institucionales_seguridad',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Seguridad con perspectiva de género.";
+            unset($datos_dncs['acc_institucionales_seguridad']);
+        };
+        if (array_key_exists('acc_institucionales_norma',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Norma 025.Igualdad laboral.";
+            unset($datos_dncs['acc_institucionales_norma']);
+        };
+        if (array_key_exists('acc_institucionales_induccion',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Inducción al Servicio Público.";
+            unset($datos_dncs['acc_institucionales_induccion']);
+        };
+        if (array_key_exists('acc_institucionales_actualizacion',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Actualización en Gestión archivística, un camino hacia la transparencia y rendición de cuentas.";
+            unset($datos_dncs['acc_institucionales_actualizacion']);
+        };
+        if (array_key_exists('acc_institucionales_documentos',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Documentos Administrativos.";
+            unset($datos_dncs['acc_institucionales_documentos']);
+        };
+        if (array_key_exists('acc_institucionales_politicas',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Políticas públicas y el Ciudadano.";
+            unset($datos_dncs['acc_institucionales_politicas']);
+        };
+        if (array_key_exists('acc_institucionales_correcto',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Correcto manejo de Información.";
+            unset($datos_dncs['acc_institucionales_correcto']);
+        };
+        if (array_key_exists('acc_institucionales_protocolos',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Protocolos de Atención y Servicio.";
+            unset($datos_dncs['acc_institucionales_protocolos']);
+        };
+        if (array_key_exists('acc_institucionales_vocacion',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Vocación de Servicio.";
+            unset($datos_dncs['acc_institucionales_vocacion']);
+        };
+        if (array_key_exists('acc_institucionales_vocacion',$datos_dncs)) {
+            $datos_dncs['acc_institucionales'] = $datos_dncs['acc_institucionales']. "\r\n".
+            "Vocación de Servicio.";
+            unset($datos_dncs['acc_institucionales_vocacion']);
+        };
+        if (array_key_exists('acc_des_humano_solucion',$datos_dncs)) {
+            $datos_dncs['acc_des_humano'] = 
+            "Solución de conflictos.";
+            unset($datos_dncs['acc_des_humano_solucion']);
+        };
+        if (array_key_exists('acc_des_humano_como',$datos_dncs)) {
+            $datos_dncs['acc_des_humano'] = $datos_dncs['acc_des_humano']. "\r\n".
+            "Como afrontar las dificultades laborales.";
+            unset($datos_dncs['acc_des_humano_como']);
+        };
+        if (array_key_exists('acc_des_humano_comunicacion',$datos_dncs)) {
+            $datos_dncs['acc_des_humano'] = $datos_dncs['acc_des_humano']. "\r\n".
+            "Comunicación consciente.";
+            unset($datos_dncs['acc_des_humano_comunicacion']);
+        };
+        if (array_key_exists('acc_des_humano_importancia',$datos_dncs)) {
+            $datos_dncs['acc_des_humano'] = $datos_dncs['acc_des_humano']. "\r\n".
+            "La importancia de aceptarse a sí mismos.";
+            unset($datos_dncs['acc_des_humano_importancia']);
+        };
+        if (array_key_exists('acc_des_humano_inteligencia',$datos_dncs)) {
+            $datos_dncs['acc_des_humano'] = $datos_dncs['acc_des_humano']. "\r\n".
+            "Inteligencia emocional.";
+            unset($datos_dncs['acc_des_humano_inteligencia']);
+        };
+        if (array_key_exists('acc_administrativas_actualizacion',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = 
+            "Actualización de procedimientos, Mejora Continua.";
+            unset($datos_dncs['acc_administrativas_actualizacion']);
+        };
+        if (array_key_exists('acc_administrativas_cumplimiento',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Cumplimiento de objetivos y metas Institucionales.";
+            unset($datos_dncs['acc_administrativas_cumplimiento']);
+        };
+        if (array_key_exists('acc_administrativas_administracion',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Administración efectiva del tiempo.";
+            unset($datos_dncs['acc_administrativas_administracion']);
+        };
+        if (array_key_exists('acc_administrativas_clima',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Clima laboral.";
+            unset($datos_dncs['acc_administrativas_clima']);
+        };
+        if (array_key_exists('acc_administrativas_modernizacion',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Modernización administrativa y diseño organizacional.";
+            unset($datos_dncs['acc_administrativas_modernizacion']);
+        };
+        if (array_key_exists('acc_administrativas_recursos',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Administración de recursos humanos.";
+            unset($datos_dncs['acc_administrativas_recursos']);
+        };
+        if (array_key_exists('acc_administrativas_materiales',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Administración de recursos materiales.";
+            unset($datos_dncs['acc_administrativas_materiales']);
+        };
+        if (array_key_exists('acc_administrativas_sistema',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Sistema de calidad.";
+            unset($datos_dncs['acc_administrativas_sistema']);
+        };
+        if (array_key_exists('acc_administrativas_otro',$datos_dncs)) {
+            $datos_dncs['acc_administrativas'] = $datos_dncs['acc_administrativas']. "\r\n".
+            "Otro.";
+            unset($datos_dncs['acc_administrativas_otro']);
+        };
+        //dd( $datos_dncs);        
+        return ($datos_dncs);
+    }
+    public function edit( $id)
+    {             
+        $this->model = $this->model->FindOrFail( $id);
+        //dd( $this->model->getAttribute('word_init'));
+        $arreglo = $this->model->getAttributes();
+        //dd( $arreglo);
+        if ( strpos( $arreglo['word_int'], "Tablas en Word.") !== false) {
+            $this->model->setAttribute('word_int_tablas',"1");            
+        }
+        if ( strpos( $arreglo['word_ava'], "Combinación de Correspondencia.") !== false) {
+            $this->model->setAttribute('word_ava_correspondencia',"1");            
+        }
+        if ( strpos( $arreglo['excel_int'], "Gráficos en Excel.") !== false) {
+            $this->model->setAttribute("excel_int_graficos","1");            
+        }
+        if ( strpos( $arreglo['excel_int'], "Formulas Básicas en Excel.") !== false) {
+            $this->model->setAttribute("excel_int_formulas","1");            
+        }
+        if ( strpos( $arreglo['excel_ava'], "Herramientas de visualización de datos.") !== false) {
+            $this->model->setAttribute("excel_ava_herramientas","1");            
+        }
+        if ( strpos( $arreglo['excel_ava'], "Funciones y herramientas avanzadas.") !== false) {
+            $this->model->setAttribute("excel_ava_funciones","1");
+        }
+        if ( strpos( $arreglo['power_point'], "Las Cualidades de la Presentaciones.") !== false) {
+            $this->model->setAttribute("power_point_cualidades","1");
+        }
+        if ( strpos( $arreglo['nuevas_tec'], "Competencia comunicativa a través de la competencia digital.") !== false) {
+            $this->model->setAttribute("nuevas_tec_competencia","1");
+        }
+        if ( strpos( $arreglo['nuevas_tec'], "Nuevas tecnologías (zoom).") !== false) {
+            $this->model->setAttribute("nuevas_tec_zoom","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Ética e Integridad en el Servicio Público.") !== false) {
+            $this->model->setAttribute("acc_institucionales_etica","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Valores Gubernamentales.") !== false) {
+            $this->model->setAttribute("acc_institucionales_valores","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Responsabilidades Administrativas de las personas servidoras públicas.") !== false) {
+            $this->model->setAttribute("acc_institucionales_responsabilidades","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Metodología de las 5´s.") !== false) {
+            $this->model->setAttribute("acc_institucionales_metodologia","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Identificación Institucional.") !== false) {
+            $this->model->setAttribute("acc_institucionales_identificacion","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Violencia ver, conocer y reconocer.") !== false) {
+            $this->model->setAttribute("acc_institucionales_violencia","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Seguridad con perspectiva de género.") !== false) {
+            $this->model->setAttribute("acc_institucionales_seguridad","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Seguridad con perspectiva de género.") !== false) {
+            $this->model->setAttribute("acc_institucionales_seguridad","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Norma 025.Igualdad laboral.") !== false) {
+            $this->model->setAttribute("acc_institucionales_norma","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Inducción al Servicio Público.") !== false) {
+            $this->model->setAttribute("acc_institucionales_induccion","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Actualización en Gestión archivística, un camino hacia la transparencia y rendición de cuentas.") !== false) {
+            $this->model->setAttribute("acc_institucionales_actualizacion","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Documentos Administrativos.") !== false) {
+            $this->model->setAttribute("acc_institucionales_documentos","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Políticas públicas y el Ciudadano.") !== false) {
+            $this->model->setAttribute("acc_institucionales_politicas","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Correcto manejo de Información.") !== false) {
+            $this->model->setAttribute("acc_institucionales_correcto","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Protocolos de Atención y Servicio.") !== false) {
+            $this->model->setAttribute("acc_institucionales_protocolos","1");
+        }
+        if ( strpos( $arreglo['acc_institucionales'], "Vocación de Servicio.") !== false) {
+            $this->model->setAttribute("acc_institucionales_vocacion","1");
+        }
+        if ( strpos( $arreglo['acc_des_humano'], "Solución de conflictos.") !== false) {
+            $this->model->setAttribute("acc_des_humano_solucion","1");
+        }
+        if ( strpos( $arreglo['acc_des_humano'], "Como afrontar las dificultades laborales.") !== false) {
+            $this->model->setAttribute("acc_des_humano_como","1");
+        }
+        if ( strpos( $arreglo['acc_des_humano'], "Comunicación consciente.") !== false) {
+            $this->model->setAttribute("acc_des_humano_comunicacion","1");
+        }
+        if ( strpos( $arreglo['acc_des_humano'], "La importancia de aceptarse a sí mismos.") !== false) {
+            $this->model->setAttribute("acc_des_humano_importancia","1");
+        }
+        if ( strpos( $arreglo['acc_des_humano'], "Inteligencia emocional.") !== false) {
+            $this->model->setAttribute("acc_des_humano_inteligencia","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Actualización de procedimientos, Mejora Continua.") !== false) {
+            $this->model->setAttribute("acc_administrativas_actualizacion","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Cumplimiento de objetivos y metas Institucionales.") !== false) {
+            $this->model->setAttribute("acc_administrativas_cumplimiento","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Administración efectiva del tiempo.") !== false) {
+            $this->model->setAttribute("acc_administrativas_administracion","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Clima laboral.") !== false) {
+            $this->model->setAttribute("acc_administrativas_clima","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Modernización administrativa y diseño organizacional.") !== false) {
+            $this->model->setAttribute("acc_administrativas_modernizacion","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Administración de recursos humanos.") !== false) {
+            $this->model->setAttribute("acc_administrativas_recursos","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Administración de recursos materiales.") !== false) {
+            $this->model->setAttribute("acc_administrativas_materiales","1");
+        }
+        if ( strpos( $arreglo['acc_administrativas'], "Sistema de calidad.") !== false) {
+            $this->model->setAttribute("acc_administrativas_sistema","1");
+        }        
+        if ( strpos( $arreglo['acc_administrativas'], "Otro.") !== false) {
+            $this->model->setAttribute("acc_administrativas_otro","1");
+        }
+        //dd( $this->model);
+        return ( $this->model );
+    }
+    public function save(Request $request, $id)
+    {
+        $campos=        $this->get_campos_val();
+        $mensajes=      $this->get_mensajes_val();
+        $this->validate( $request, $campos, $mensajes);
+        $datos_dncs = $this->fix_datos_dncs( $request);
+        //dd($datos_dncs);
+        $this->model->where('id', '=', $id)->update( $datos_dncs);
+    }
+    public function get_campos_val()
+    {
+        $campos=[
+            'fk_cve_periodo'=> 'required|string|max:3|min:1',
+            'num_emp'=> 'required|digits_between:1,999999999999',
+            'nombre_completo'=> 'required|string|max:80|min:5',
+            'dep_o_ent'=> 'required|string|max:180|min:5',
+            'unidad_admva'=> 'required|string|max:180|min:1',
+            'area'=> 'required|string|max:180|min:5',
+            'grado_est'=> 'required|string|max:80|min:5',
+            'correo'=> 'required|string|max:80|min:5',
+            'telefono'=> 'required|string|max:40|min:10',
+            'funciones'=> 'required|string|max:500|min:10',
+        ];
+        return $campos;
+    }
+    public function get_mensajes_val()
+    {
+        $mensajes=[            
+            'fk_cve_periodo.required'=>'El Periodo es requerido, debe contener al menos 1 caracter.',
+            'fk_cve_periodo.min'=>'El Periodo debe contener al menos 1 caracter.',
+            'fk_cve_periodo.max'=>'El Periodo debe contener máximo 3 caracteres.',
+            'num_emp.required'=>'El Número de Empleado es requerido y debe ser numérico',
+            'num_emp.min'=>'El Periodo debe ser numérico, entero y mayor que cero.',
+            'num_emp.max'=>'El Periodo debe ser numérico, entero y menor o igual a 999999999.',
+            'nombre_completo.required'=>'El Nombre de Empleado es requerido y debe iniciar por los apellidos',
+            'nombre_completo.min'=>'El Nombre del Empleado debe tener al menos 5 caracteres.',
+            'nombre_completo.max'=>'El Nombre del Empleado debe tener como máximo 80 caracteres.',
+            'dep_o_ent.required'=>'La Dependencia o Entidad es requerida',
+            'dep_o_ent.min'=>'La Dependencia o Entidad debe tener al menos 5 caracteres.',
+            'dep_o_ent.max'=>'La Dependencia o Entidad debe tener como máximo 180 caracteres.',
+            'unidad_admva.required'=>'La Unidad Administrativa es requerida',
+            'unidad_admva.min'=>'La Unidad Administrativa debe tener al menos 1 caracter.',
+            'unidad_admva.max'=>'La Unidad Administrativa debe tener como máximo 180 caracteres.',
+            'area.required'=>'El Area es requerida',
+            'area.min'=>'El Area debe tener al menos 5 caracteres.',
+            'area.max'=>'El Area debe tener como máximo 180 caracteres.',
+            'grado_est.required'=>'El Grado de Estudios es requerida',
+            'grado_est.min'=>'El Grado de Estudios debe tener al menos 5 caracteres.',
+            'grado_est.max'=>'El Grado de Estudios debe tener como máximo 80 caracteres.',
+            'correo.required'=>'El Correo Electrónico es requerida',
+            'correo.min'=>'El Correo Electrónico debe tener al menos 5 caracteres.',
+            'correo.max'=>'El Correo Electrónico debe tener como máximo 80 caracteres.',
+            'telefono.required'=>'El Número de Teléfono es requerido',
+            'telefono.min'=>'El Número de Teléfono debe tener al menos 10 caracteres e inclupir el area.',
+            'telefono.max'=>'El Número de Teléfono debe tener como máximo 40 caracteres e inclupir el area.',
+            'funciones.required'=>'Las Funciones son requeridas',
+            'funciones.min'=>'Las Funciones deben tener al menos 10 caracteres.',
+            'funciones.max'=>'Las Funciones deben tener como máximo 500 caracteres.',        
+        ];
+        return $mensajes;
     }
 }

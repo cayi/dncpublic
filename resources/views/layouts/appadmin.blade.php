@@ -36,7 +36,7 @@
                                 <a class="nav-link" href="{{ url('/admin/Perfilusers')}}" > {{ __('Periles de Usuarios') }}</a>
                                 <a class="nav-link" href="{{ url('/admin/Usuarios')}}" > {{ __('Usuarios') }}</a>
                                 <a class="nav-link" href="{{ url('/admin/Dncs')}}" >{{ __('DNC') }}</a>
-                                <a class="nav-link" href="{{ url('/admin/Dlantillas')}}" >{{ __('Plantillas') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/Plantillas')}}" >{{ __('Plantillas') }}</a>
                              </div>
                         </li>                         
                         <li class="nav-item dropdown">
