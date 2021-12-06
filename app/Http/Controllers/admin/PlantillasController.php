@@ -67,4 +67,29 @@ class PlantillasController extends Controller
         $this->plantillasRepository->save( $request, $id); 
         return redirect("/admin/Plantillas")->with('mensaje','Plantilla Actualizada.');
     }
+    function import(Request $request)    
+    {
+      if ( $this->plantillasRepository->es_administrador() == "Si") 
+      {
+        return $this->plantillasRepository->import( $request);
+      }
+      else
+      {        
+        return $this->plantillasRepository->get_user_data();
+      }
+    }
+    function indeximport()
+    {
+      //dd("hey");
+      if ( $this->plantillasRepository->es_administrador() == "Si") 
+      {
+          $periodos           = $this->plantillasRepository->periodos();
+          $plantillas         = $this->plantillasRepository->all();
+          return view('/admin/Plantillas/Import', compact('plantillas','periodos'));
+      }
+      else
+      {        
+        return $this->dncsRepository->get_user_data();        
+      }
+    }
 }

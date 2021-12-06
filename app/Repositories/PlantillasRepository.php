@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 // Necesario para la clase Session
 use Session;
 use Auth;
+use Excel;
 
 use App\Models\Plantillas;
 use App\Models\Perfilusers;
 use App\Models\User;
 use App\Models\Periodos;
+
+use App\Imports\PlantillasImport;
 
 class PlantillasRepository extends Controller
 {
@@ -143,7 +146,7 @@ class PlantillasRepository extends Controller
         $campos=        $this->get_campos_val();
         $mensajes=      $this->get_mensajes_val();
         $this->validate( $request, $campos, $mensajes);
-        $datos_plantillas = $this->fix_datos_dncs( $request);
+        $datos_plantillas = $this->fix_datos_plantillas( $request);
         //dd($datos_plantillas);
         $this->model->where('id', '=', $id)->update( $datos_plantillas);
     }
@@ -214,5 +217,131 @@ class PlantillasRepository extends Controller
             'num_plaza.max'=>'El Tipo de Organismo debe tener como máximo 5 caracteres.',
         ];
         return $mensajes;
+    }
+    public function es_administrador() 
+    {
+      if (Auth::user()->fk_cve_perfil_usuario != "A") 
+      {
+        return back()->with('success', 'Error, solo pueden ingresar los Administradores.');  
+      }
+      return "Si";
+    }
+    public function import(Request $request) 
+    {
+      $datos= $this->get_user_data();
+      //dd("hey");          
+      $clean = $request->clean;
+      if ($clean == 'Limpiar')
+      {
+          DB::table('dncs')->where('id', '>', 1)->delete();
+          return back()->with('success', 'Tabla de Plantillas limpiada, excepto el primer registro.');
+      } // end if ($clean)
+      else 
+      {
+        $this->validate($request, 
+          [ 'select_file'  => 'required|mimes:xls,xlsx'   ], 
+          [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx' ]
+        );
+        $path1 = $request->file('select_file')->store('temp'); 
+        $path = storage_path('app').'/'.$path1;          
+        try {
+          //dd($path1);
+          $data = Excel::toCollection(new PlantillasImport, $path);          
+          $existentes = 0;          
+          if($data->count() > 0)
+          {
+           foreach($data->toArray() as $key => $value)
+           {            
+            foreach($value as $row)
+            {
+              //dd(count($row) );
+              if (! (               
+                isset($row['num_emp']) &&
+                isset($row['nombre_completo']) &&
+                isset($row['sexo']) &&
+                isset($row['nivel']) &&
+                isset($row['dependnecia']) &&
+                isset($row['unidad_admva']) &&
+                isset($row['puesto']) &&
+                isset($row['municipio']) &&
+                isset($row['plaza']) &&
+                isset($row['tipo_plaza']) &&
+                isset($row['fuente']) &&
+                isset($row['plantilla']) &&
+                isset($row['tipo_org']) &&
+                isset($row['num_plaza'])                
+                ))
+              {                 
+                return back()->with('success', 
+                'Error: El archivo de Excel de Plantillas debe tener las columnas siguientes : '.
+                "num_emp, nombre_completo, sexo, nivel, dependencia, unidad_admva, ".
+                "puesto, municipio, plaza, tipo_plaza, fuente, plantilla, tipo_org, num_plaza. ".
+                "Alguno de ellos esta faltando. ".
+                "Vea la documentación Técnica para importar Plantillas."
+                 );                
+              } // end if(!)
+              //dd($row);
+              $plantillas = DB::table('plantillas')
+                ->where('num_emp', $row['num_emp'])
+                ->where('dependencia', $row['dependencia'])
+                ->get();
+              if ( $plantillas->isNotEmpty()) 
+              {
+                $existentes= $existentes + 1;
+              }
+              else 
+              { 
+                $insert_data[] = array(                
+                    'num_emp'               => $row['num_emp'],
+                    'nombre_completo'       => $row['nombre_completo'],
+                    'sexo'                  => $row['sexo'],
+                    'nivel'                 => $row['nivel'],
+                    'dependencia'           => $row['dependencia'],
+                    'unidad_admva'          => $row['unidad_admva'],
+                    'puesto'                => $row['puesto'],
+                    'municipio'             => $row['municipio'],
+                    'plaza'                 => $row['plaza'],
+                    'tipo_plaza'            => $row['tipo_plaza'],                    
+                    'fuente'                => $row['fuente'],
+                    'plantilla'             => $row['plantilla'],
+                    'tipo_org'              => $row['tipo_org'],
+                    'num_plaza'             => $row['num_plaza']
+                    ); 
+              } // end if( $row)
+            } // end foreach($value as $row)
+           } // end foreach($data->toArray() as $key => $value)
+           $suma = 0;
+           if(!empty($insert_data))
+           {
+            //dd($insert_data);
+            $suma = count($insert_data);
+            //DB::table('dncs')->insert($insert_data);
+            foreach (array_chunk($insert_data,1000) as $t) 
+            {
+                DB::table('plantillas')->insert($t);
+            }
+           } // end if(!empty)
+          } // end if($data)
+          return back()->with('success', 
+            'El archivo de Plantillas de Excel se subió con éxito. '.
+            "Se repitieron ".$existentes." registro(s)".
+            " y se subieron ".$suma. " registro(s).");
+          //$data = Excel::import(new UsersImport,$path);
+          //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');
+        } 
+        catch (\Illuminate\Database\QueryException $e) 
+        {
+            return back()->with('success', 'Ocurrió un error:  '.$e->errorInfo[2]);
+        } // end catch
+      } // end else $clean == 'Limpiar'
+    } // end import function  
+    public function get_user_data() 
+    {
+      $datos=[
+        "usuario"=>Auth::user()->name,
+        "email"=>Auth::user()->email,
+        "success"=>"Error, Solo pueden entrar Administradores a esta opción"
+      ]; 
+      return $datos;
     }
 }

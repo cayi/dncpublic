@@ -64,9 +64,9 @@
       ?>
     </td>
 		<td>
-        <a href="{{ url('/admin/Plantilla/'.$plantilla->id.'/edit') }}" class="btn btn-warning"> Editar
+        <a href="{{ url('/admin/Plantillas/'.$plantilla->id.'/edit') }}" class="btn btn-warning"> Editar
         </a>
-        <form action="{{ url('/admin/Plantilla/'.$plantilla->id)}}" 
+        <form action="{{ url('/admin/Plantillas/'.$plantilla->id)}}" 
             class="d-inline" method="post" enctype="multipart/form-data">
             @csrf
             {{ method_field('DELETE') }}

@@ -19,7 +19,10 @@ Se intenta utilizar las mejores practicas como son:
  NO usar giones bajos en los nombres de las tablas
  USAR la letra s al final de los nombres de las tablas (probar)
  NO usar mayusculas entre medio de los nombres de Repositorios o Modelos
- 
+ Al IMPORTAR de Excel todas las celdas deben tener datos, o sea NO DEJAR CELDAS VACIAS
+ EL formato DNC se puede cargar vacio, con las primeras 11 columnas o lleno con las 23 columnas
+ La cantidad de registros que pude cargar a la vez en DNC son 1000 registros, no se si es por el tamaño
+   del archivo o cantidad de registros, el error es: 
 
 pra subir a la nube
 git add .

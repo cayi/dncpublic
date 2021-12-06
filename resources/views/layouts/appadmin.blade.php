@@ -45,9 +45,9 @@
                                 Importar
                             </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                <a class="nav-link" href="{{ url('/admin/import_excel') }}" > {{ __('Usuarios') }}</a>
-                                <a class="nav-link" href="{{ url('/admin/import_excel_DNC') }}" >{{ __('Formato DNC') }}</a>
-                                <a class="nav-link" href="{{ url('/admin/import_excel_Plantillas')}}" >{{ __('Plantillas') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/importUsuarios') }}" > {{ __('Usuarios') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/importDncs') }}" >{{ __('Formato DNC') }}</a>
+                                <a class="nav-link" href="{{ url('/admin/importPlantillas')}}" >{{ __('Plantillas') }}</a>
                              </div>
                         </li>
                         <li class="nav-item dropdown">
