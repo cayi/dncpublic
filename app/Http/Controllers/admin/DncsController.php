@@ -37,7 +37,6 @@ class DncsController extends Controller
         $usuarios           = $this->dncsRepository->usuarios();
         $periodos           = $this->dncsRepository->periodos();
         $dncs               = $this->dncsRepository->dncs_blank();
-        //dd($dncs);
         return view('admin/Dncs.create', compact(
             'usuarios',
             'perfil_usuarios',
@@ -84,8 +83,7 @@ class DncsController extends Controller
       }
     }
     function indeximport()
-    {
-      
+    { 
       if ( $this->dncsRepository->es_administrador() == "Si") 
       {
           $periodos           = $this->dncsRepository->periodos();

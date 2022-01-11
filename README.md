@@ -11,6 +11,13 @@ Se intenta utilizar las mejores practicas como son:
  Uso de Repositorios
  Uso de Modelos
  Importacion y Exportacion de Datos con hojas de Excel
+
+ CARACTERISTICAS:
+ Usa Laravel 8.0
+ Importa / Exporta archivos de Excel modernos XLSX y antiguos XLS
+ Soporta borrado logico de registros SOFTDELETES
+ Usa livewire para importar archivos grandes de Excel, informa al usuario el avance.
+
  
 
  NOTAS:
@@ -23,6 +30,7 @@ Se intenta utilizar las mejores practicas como son:
  EL formato DNC se puede cargar vacio, con las primeras 11 columnas o lleno con las 23 columnas
  La cantidad de registros que pude cargar a la vez en DNC son 1000 registros, no se si es por el tamaño
    del archivo o cantidad de registros, el error es: 
+ En heroku solo soporta archivos viejos de Excel XLS 
 
 pra subir a la nube
 git add .

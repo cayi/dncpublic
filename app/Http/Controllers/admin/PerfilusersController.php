@@ -16,9 +16,7 @@ class PerfilusersController extends Controller
     }
     public function index()
     {   
-        //dd("hey");
         $datos['Perfilusers'] = $this->perfilusersRepository->all();
-        //dd($datos);
         return view('admin/Perfilusers.index', $datos);
     }
     public function create()

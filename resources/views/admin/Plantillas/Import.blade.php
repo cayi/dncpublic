@@ -34,6 +34,14 @@
        <td width="30%" align="left">
         <input type="submit" name="clean" class="btn btn-primary" value="Limpiar">
        </td>
+       <div>
+           @if($importing && !$importFinished)
+            <div wire:poll="updateImportProgress">Importando...por favor espere.</div>
+          @endif
+          @if($importFinished)
+            Terminó de importar.
+          @endif
+       </div>
       </tr>
       <tr>
        <td width="40%" align="right"></td>

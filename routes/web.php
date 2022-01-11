@@ -32,7 +32,10 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //Route::get('/eva2', 'App\Http\Controllers\EvaluadoresController@eva2');
 //Route::get('/val/{id}', 'App\Http\Controllers\EvaluadosController@val');
 //Route::get('/evaluadores', 'App\Http\Controllers\EvaluadoresController@index');
-   
+
+//Route::post('import', [HomeController::class, 'import'])->name('import');
+//Route::post('import', 'App\Http\Controllers\HomeController@import');
+
 Route::prefix('admin')->group(function () {   
 
     Route::get('/exp/{action}', 'App\Http\Controllers\EvaluadosController@exp');

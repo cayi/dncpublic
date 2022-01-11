@@ -69,6 +69,7 @@ class PlantillasController extends Controller
     }
     function import(Request $request)    
     {
+      //dd('imp');
       if ( $this->plantillasRepository->es_administrador() == "Si") 
       {
         return $this->plantillasRepository->import( $request);
@@ -85,7 +86,14 @@ class PlantillasController extends Controller
       {
           $periodos           = $this->plantillasRepository->periodos();
           $plantillas         = $this->plantillasRepository->all();
-          return view('/admin/Plantillas/Import', compact('plantillas','periodos'));
+          $importing          = false;
+          $importFinished     = false;
+          return view('/admin/Plantillas/Import', compact(
+              'plantillas',
+              'importing',
+              'importFinished',
+              'periodos'
+            ));
       }
       else
       {        
