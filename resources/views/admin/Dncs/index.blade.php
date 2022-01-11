@@ -45,18 +45,22 @@
   <tbody>
   @foreach ($dncs as $dnc)
 	<tr>
-		<td>{{ $dnc->id}}</td>
+		<td>{{ $dnc->id}}</td>    
     <td>      
-      <?php
+      <?php 
+      /*       
         foreach ($periodos as $periodo) {
+           //dd($periodo);
            if ($periodo->cve_periodo == $dnc->fk_cve_periodo) 
            {
              echo $periodo->descripcion;
            };
           };
+          */
+          echo $dnc->fk_cve_periodo;
       ?>
     </td>    
-    <td>{{ $dnc->num_emp}}</td>
+    <td>{{ $dnc->num_emp }}</td>
     <td>{{ $dnc->nombre_completo}}</td>
     <td>{{ $dnc->dep_o_ent}}</td>
     <td>{{ $dnc->unidad_admva}}</td>

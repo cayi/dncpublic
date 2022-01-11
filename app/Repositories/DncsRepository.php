@@ -8,11 +8,14 @@ use App\Http\Controllers\Controller;
 // Necesario para la clase Session
 use Session;
 use Auth;
+use Excel;
 
 use App\Models\Dncs;
 use App\Models\Perfilusers;
 use App\Models\User;
 use App\Models\Periodos;
+
+use App\Imports\DncsImport;
 
 class DncsRepository extends Controller
 {
@@ -20,6 +23,23 @@ class DncsRepository extends Controller
     public function __construct()
     {        
         $this->model = New Dncs();
+    }
+    public function get_user_data() 
+    {
+      $datos=[
+        "usuario"=>Auth::user()->name,
+        "email"=>Auth::user()->email,
+        "success"=>"Error, Solo pueden entrar Administradores a esta opción"
+      ]; 
+      return $datos;
+    }
+    public function es_administrador() 
+    {
+      if (Auth::user()->fk_cve_perfil_usuario != "A") 
+      {
+        return back()->with('success', 'Error, solo pueden ingresar los Administradores.');  
+      }
+      return "Si";
     }
     // completa la vista del Usuario normal Evaluador!!
     public function index()
@@ -519,4 +539,137 @@ class DncsRepository extends Controller
         ];
         return $mensajes;
     }
+    public function import(Request $request) 
+    {
+      $datos= $this->get_user_data();
+      //dd("hey");          
+      $clean = $request->clean;
+      if ($clean == 'Limpiar')
+      {
+          DB::table('dncs')->where('id', '>', 1)->delete();
+          return back()->with('success', 'Tabla de Formatos DNC limpiada, excepto el primer registro.');
+      } // end if ($clean)
+      else 
+      {
+        $this->validate($request, 
+          [ 'select_file'  => 'required|mimes:xls,xlsx'   ], 
+          [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx' ]
+        );
+         $path1 = $request->file('select_file')->store('temp'); 
+         $path = storage_path('app').'/'.$path1;          
+         try {
+          //dd($path1);
+          $data = Excel::toCollection(new DncsImport, $path);          
+          $existentes = 0;          
+          if($data->count() > 0)
+          {
+           foreach($data->toArray() as $key => $value)
+           {            
+            foreach($value as $row)
+            {
+              //dd(count($row) );
+              if (! (               
+                isset($row['cve_plantilla']) &&
+                isset($row['cve_periodo']) &&
+                isset($row['num_emp']) &&
+                isset($row['nombre_completo']) &&
+                isset($row['dep_o_ent']) &&
+                isset($row['unidad_admva']) &&
+                isset($row['area']) &&
+                isset($row['grado_est']) &&
+                isset($row['correo']) &&
+                isset($row['telefono']) &&
+                isset($row['funciones']) 
+                ))
+              {                 
+                  return back()->with('success', 
+                  'Error: El archivo de Excel de Formatos de DNC debe tener las columnas siguientes : '.
+                  "cve_plantilla, cve_periodo, num_emp, nombre_completo, dep_o_ent, unidad_admva, ".
+                  "area, grado_est, correo, telefono, funciones. ".
+                  "Alguno de ellos esta faltando. ".
+                  "Vea la documentación Técnica para importar formatos DNC llenos y vacíos."
+                   );                
+              } // end if(!)
+              //dd($row);
+              $dncs = DB::table('dncs')
+                ->where('num_emp', $row['num_emp'])
+                ->where('fk_cve_periodo', $row['cve_periodo'])
+                ->get();
+              if ( $dncs->isNotEmpty()) 
+              {
+                $existentes= $existentes + 1;
+              }
+              else 
+              { 
+               if (isset($row['word_int'])) {
+                $insert_data[] = array(                
+                    'fk_id_plantillas'    => $row['cve_plantilla'],
+                    'fk_cve_periodo'      => $row['cve_periodo'],
+                    'num_emp'             => $row['num_emp'],
+                    'nombre_completo'     => $row['nombre_completo'],
+                    'dep_o_ent'           => $row['dep_o_ent'],
+                    'unidad_admva'        => $row['unidad_admva'],
+                    'area'                => $row['area'],
+                    'grado_est'           => $row['grado_est'],
+                    'correo'              => $row['correo'],
+                    'telefono'            => $row['telefono'],
+                    'funciones'           => $row['funciones'],
+                    'word_int'            => $row['word_int'],
+                    'word_ava'            => $row['word_ava'],
+                    'excel_int'           => $row['excel_int'],
+                    'excel_ava'           => $row['excel_ava'],
+                    'power_point'         => $row['power_point'],
+                    'nuevas_tec'          => $row['nuevas_tec'],
+                    'acc_institucionales' => $row['acc_institucionales'],
+                    'acc_des_humano'      => $row['acc_des_humano'],
+                    'acc_administrativas' => $row['acc_administrativas'],
+                    'otro_curso'          => $row['otro_curso'],
+                    'interes_instructor'  => $row['interes_instructor'],
+                    'tema'                => $row['tema']
+                    );                  
+               } // end if isset($row['word_int'])
+               else
+               {
+                $insert_data[] = array(                
+                    'fk_id_plantillas'    => $row['cve_plantilla'],
+                    'fk_cve_periodo'      => $row['cve_periodo'],
+                    'num_emp'             => $row['num_emp'],
+                    'nombre_completo'     => $row['nombre_completo'],
+                    'dep_o_ent'           => $row['dep_o_ent'],
+                    'unidad_admva'        => $row['unidad_admva'],
+                    'area'                => $row['area'],
+                    'grado_est'           => $row['grado_est'],
+                    'correo'              => $row['correo'],
+                    'telefono'            => $row['telefono'],
+                    'funciones'           => $row['funciones']);
+               } //end else isset($row['word_int'])
+              } // end if( $row)
+            } // end foreach($value as $row)
+           } // end foreach($data->toArray() as $key => $value)
+           $suma = 0;
+           if(!empty($insert_data))
+           {
+            //dd($insert_data);
+            $suma = count($insert_data);
+            //DB::table('dncs')->insert($insert_data);
+            foreach (array_chunk($insert_data,1000) as $t) 
+            {
+                DB::table('dncs')->insert($t);
+            }
+           } // end if(!empty)
+          } // end if($data)
+          return back()->with('success', 
+            'El archivo de Formatos DNC de Excel se subió con éxito. '.
+            "Se repitieron ".$existentes." registro(s)".
+            " y se subieron ".$suma. " registro(s).");         
+          //$data = Excel::import(new UsersImport,$path);
+          //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');
+        } 
+        catch (\Illuminate\Database\QueryException $e) 
+        {
+            return back()->with('success', 'Ocurrió un error:  '.$e->errorInfo[2]);
+        } // end catch
+      } // end else $clean == 'Limpiar'
+    } // end import function  
+    
 }

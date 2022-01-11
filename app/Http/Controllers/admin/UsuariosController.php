@@ -47,4 +47,29 @@ class UsuariosController extends Controller
         $this->usuariosRepository->save( $request, $id); 
         return redirect("/admin/Usuarios")->with('mensaje','Usuario Actualizado.');
     }
+    function indeximport()
+    {
+      //dd("aqui");      
+      if ( $this->usuariosRepository->es_administrador() == "Si") 
+      {
+          $usuarios = $this->usuariosRepository->all();
+          return view('/admin/Usuarios/import', compact('usuarios'));
+      }
+      else
+      {        
+        $datos= $this->usuariosRepository->get_user_data();
+        return $datos;
+      }
+    }
+    function import(Request $request)    
+    {
+      if ( $this->usuariosRepository->es_administrador() == "Si") 
+      {
+        return $this->usuariosRepository->import( $request);
+      }
+      else
+      {        
+        return $this->usuariosRepository->get_user_data();
+      }
+    }
 }

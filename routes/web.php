@@ -32,15 +32,23 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 //Route::get('/eva2', 'App\Http\Controllers\EvaluadoresController@eva2');
 //Route::get('/val/{id}', 'App\Http\Controllers\EvaluadosController@val');
 //Route::get('/evaluadores', 'App\Http\Controllers\EvaluadoresController@index');
-//Route::get('/imp/{id}', 'App\Http\Controllers\EvaluadosController@imp');
-//Route::get('/imp2/{id}', 'App\Http\Controllers\EvaluadosController@imp2');
-    
+
+//Route::post('import', [HomeController::class, 'import'])->name('import');
+//Route::post('import', 'App\Http\Controllers\HomeController@import');
+
 Route::prefix('admin')->group(function () {   
 
     Route::get('/exp/{action}', 'App\Http\Controllers\EvaluadosController@exp');
 
-    Route::get('/import_excel', 'App\Http\Controllers\admin\ImportExcelController@index');
-    Route::post('/import_excel/import', 'App\Http\Controllers\admin\ImportExcelController@import');
+    Route::get('/importUsuarios', 'App\Http\Controllers\admin\UsuariosController@indeximport');
+    Route::post('/importUsuarios/import', 'App\Http\Controllers\admin\UsuariosController@import');
+
+    Route::get('/importDncs', 'App\Http\Controllers\admin\DncsController@indeximport');
+    Route::post('/importDncs/import', 'App\Http\Controllers\admin\DncsController@import');
+
+    Route::get('/importPlantillas', 'App\Http\Controllers\admin\PlantillasController@indeximport');
+    Route::post('/importPlantillas/import', 'App\Http\Controllers\admin\PlantillasController@import');
+
     Route::resource('/Periodos', App\Http\Controllers\admin\PeriodosController::class);
     Route::resource('/Perfilusers', App\Http\Controllers\admin\PerfilusersController::class);
     Route::resource('/Usuarios', App\Http\Controllers\admin\UsuariosController::class);

@@ -25,5 +25,5 @@ class Plantillas extends Model
         'plantilla',
         'tipo_org',
         'num_plaza',
-    ];    
+    ];
 }

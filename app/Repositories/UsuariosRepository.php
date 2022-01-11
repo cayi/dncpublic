@@ -4,6 +4,12 @@ namespace App\Repositories;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use DB;
+use Session;
+use Excel;
+use Auth;
+
+use App\Imports\UsersImport;
 
 use App\Models\User;
 use App\Models\Perfilusers;
@@ -14,6 +20,14 @@ class UsuariosRepository extends Controller
     public function __construct()
     {        
         $this->model = New User();
+    }
+    public function es_administrador() 
+    {
+      if (Auth::user()->fk_cve_perfil_usuario != "A") 
+      {
+        return back()->with('success', 'Error, solo pueden ingresar los Administradores.');  
+      }
+      return "Si";
     }
     public function perfil_usuarios()
     {
@@ -26,10 +40,11 @@ class UsuariosRepository extends Controller
         $usuarios->activo = true;
         return ( $usuarios);
     }
-     public function all()
+    public function all()
     {                      
-        return( $this->model->orderBy('email', 'asc')->paginate(5));
+        return $this->model->orderBy('email', 'asc')->paginate(5);
     }
+
     public function edit( $id)
     {     
         //dd($id);
@@ -101,4 +116,94 @@ class UsuariosRepository extends Controller
         //dd($datos_usuarios);
         $this->model->insert( $datos_usuarios);
     }
+    public function import(Request $request) 
+    {
+      $datos= $this->get_user_data();
+      //dd("hey");      
+      $clean = $request->clean;
+      if ( $clean == 'Limpiar')
+      {
+          DB::table('users')->where('id', '>', 2)->delete();
+          return back()->with('success', 'Base de datos limpiada, excepto los primeros 2 registros.');  
+      } // end if ($clean
+      else 
+      {
+        $this->validate($request, 
+          [ 'select_file'  => 'required|mimes:xls,xlsx'   ], 
+          [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx' ]
+        );
+        $path1 = $request->file('select_file')->store('temp'); 
+        $path = storage_path('app').'/'.$path1;          
+        try 
+        {
+          //dd($path1);
+          $data = Excel::toCollection(new UsersImport, $path);
+          //$this->importUsuariosRepository->          
+          $existentes = 0;
+          if($data->count() > 0)
+          {
+           foreach($data->toArray() as $key => $value)
+           {
+            foreach($value as $row)
+            {
+              //dd($insert_data);
+              if (! (               
+                isset($row['nombre']) &&
+                isset($row['correo']) &&
+                isset($row['contrasenia']) 
+                ))
+              {
+                  return back()->with('success', 
+                  'Error: El archivo de Excel de Usuarios debe tener las columnas siguientes : '.
+                  "nombre, correo y contrasenia. Alguno de ellos esta faltando."
+                );
+              } // end if(!)
+              $users = DB::table('users')->where('name', $row['nombre'])->get();              
+              if ($users->isNotEmpty()) 
+              {
+                $existentes= $existentes + 1;
+              } // end if ($users
+              else
+              {                
+               $insert_data[] = array(                
+                'name'   => $row['nombre'],
+                'password'   => Hash::make($row['contrasenia']),
+                'email'   => $row['correo']
+               );
+              } // end else
+            } // end foreach($value as $row)
+           } // end foreach($data->toArray() as $key => $value)
+           $suma = 0;
+           if(!empty($insert_data))
+           {
+            //dd($insert_data);
+            $suma = count($insert_data);
+            DB::table('users')->insert($insert_data);
+           } // end if(!empty)
+          } // end if($data)
+          return back()->with('success', 'El archivo de Usuarios de Excel se subió con éxito. '.
+            "Se repitieron ".$existentes." registros".
+            " y se subieron ".$suma. " registro(s).");         
+          //$data = Excel::import(new UsersImport,$path);
+          //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');
+        } // end try
+        catch (\Illuminate\Database\QueryException $e) 
+        {
+            return back()->with('success', 'Ocurrió un error:  '.$e->errorInfo[2]);
+        } // end catch    
+      } // end else $clean == 'Limpiar'      
+  } // end function
+  public function get_user_data() 
+  {
+    $datos=[
+      "usuario"=>Auth::user()->name,
+      "email"=>Auth::user()->email,
+      "success"=>"Error, Solo pueden entrar Administradores a esta opción"
+    ]; 
+    return $datos;
+  }
+  public function perfiles()
+  {
+    return DB::table('perfilusers')->orderBy('descripcion', 'ASC')->get();
+  }
 }

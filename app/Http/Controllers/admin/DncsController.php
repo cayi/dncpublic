@@ -16,17 +16,15 @@ class DncsController extends Controller
     }
     // Menu de Administrador
     public function indexAdmin()
-    {           
+    {             
         return ( $this->dncsRepository->indexAdmin());
     }
     public function index()
-    {   
-        //dd("hey");
+    {           
         $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
         $usuarios           = $this->dncsRepository->usuarios();
         $periodos           = $this->dncsRepository->periodos();
-        $datos['dncs']      = $this->dncsRepository->all(); 
-        //dd($periodos);
+        $datos['dncs']      = $this->dncsRepository->all();       
         return view('admin/Dncs.index', $datos, compact(
             'perfil_usuarios',
             'periodos',
@@ -39,7 +37,6 @@ class DncsController extends Controller
         $usuarios           = $this->dncsRepository->usuarios();
         $periodos           = $this->dncsRepository->periodos();
         $dncs               = $this->dncsRepository->dncs_blank();
-        //dd($dncs);
         return view('admin/Dncs.create', compact(
             'usuarios',
             'perfil_usuarios',
@@ -73,5 +70,29 @@ class DncsController extends Controller
     {   
         $this->dncsRepository->save( $request, $id); 
         return redirect("/admin/Dncs")->with('mensaje','Formato DNC Actualizado.');
+    }
+    function import(Request $request)    
+    {
+      if ( $this->dncsRepository->es_administrador() == "Si") 
+      {
+        return $this->dncsRepository->import( $request);
+      }
+      else
+      {        
+        return $this->dncsRepository->get_user_data();
+      }
+    }
+    function indeximport()
+    { 
+      if ( $this->dncsRepository->es_administrador() == "Si") 
+      {
+          $periodos           = $this->dncsRepository->periodos();
+          $dncs               = $this->dncsRepository->all();
+          return view('/admin/Dncs/Import', compact('dncs','periodos'));
+      }
+      else
+      {        
+        return $this->dncsRepository->get_user_data();        
+      }
     }
 }

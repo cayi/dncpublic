@@ -13,14 +13,13 @@
      </ul>
     </div>
    @endif
-
    @if($message = Session::get('success'))
    <div class="alert alert-success alert-block">
     <button type="button" class="close" data-dismiss="alert">×</button>
            <strong>{{ $message }}</strong>
    </div>
    @endif
-   <form method="post" enctype="multipart/form-data" action="{{ url('/admin/import_excel/import') }}">
+   <form method="post" enctype="multipart/form-data" action="{{ url('/admin/importUsuarios/import') }}">
     {{ csrf_field() }}
     <div class="form-group">
      <table class="table">
@@ -44,8 +43,7 @@
      </table>
     </div>
    </form>
-   
-   <br />
+   <br>
    <div class="panel panel-default">
     <div class="panel-heading">
      <h3 class="panel-title">Datos de los Usuarios</h3>
@@ -55,21 +53,22 @@
       <table class="table table-bordered table-striped">
        <tr>
         <th>ID</th>
-        <th>NE</th>
+        <th>Perfil</th>
         <th>Nombre de Usuario</th>
         <th>Correo</th>
-        <th>contraseña codificada con Hash</th>
+        <th>Contraseña codificada con Hash (no es decifrable)</th>
        </tr>
-       @foreach($data as $row)
+       @foreach($usuarios as $usuario)
        <tr>
-        <td>{{ $row->id }}</td>
-        <td>{{ $row->num_emp }}</td>
-        <td>{{ $row->name }}</td>
-        <td>{{ $row->email }}</td>
-        <td>{{ $row->password }}</td>        
+        <td>{{ $usuario->id }}</td> 
+        <td>{{ $usuario->fk_cve_perfil_usuario }}</td> 
+        <td>{{ $usuario->name }}</td>
+        <td>{{ $usuario->email }}</td>
+        <td>{{ $usuario->password }}</td>        
        </tr>
        @endforeach
       </table>
+      {!! $usuarios->links() !!}
      </div>
     </div>
    </div>

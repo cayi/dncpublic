@@ -26,7 +26,7 @@
        > 
        {{ $periodo->descripcion }}
      </option>
-     @endforeach            
+     @endforeach
 </select>
 <br>
 <label  class="d-inline" for="num_emp"> Número de Empleado: </label>
