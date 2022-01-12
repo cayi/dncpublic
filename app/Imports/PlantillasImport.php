@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Concerns\WithProgressBar;
 use App\Models\Plantillas;
 use App\Models\User;
 
-/*
+
 class PlantillasImport implements ToModel, WithHeadingRow, WithChunkReading
 {
  
@@ -47,8 +47,8 @@ class PlantillasImport implements ToModel, WithHeadingRow, WithChunkReading
         return 5000;
     }
 }
-*/
 
+/*
 class PlantillasImport implements ToCollection, WithHeadingRow, WithChunkReading
 {
     public function collection(Collection $rows)
@@ -77,4 +77,5 @@ class PlantillasImport implements ToCollection, WithHeadingRow, WithChunkReading
     {
         return 5000;
     }
+    */
 }
