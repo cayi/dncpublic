@@ -16,6 +16,10 @@ use App\Models\User;
 use App\Models\Periodos;
 
 use App\Imports\DncsImport;
+use App\Exports\UsersExport;
+use App\Exports\DncsExport;
+use App\Exports\PlantillasExport;
+
 
 class DncsRepository extends Controller
 {
@@ -671,5 +675,18 @@ class DncsRepository extends Controller
         } // end catch
       } // end else $clean == 'Limpiar'
     } // end import function  
-    
+ 
+    public function export( $action) 
+    {
+        if ($action== "1") {
+            return Excel::download(new UsersExport, 'usuarios.xlsx');
+        }
+        if ($action== "2") {
+            return Excel::download(new DncsExport, 'dncs.xlsx');
+        }
+        if ($action== "3") {
+            return Excel::download(new PlantillasExport, 'plantillas.xlsx');        
+        }
+        return ('Opción Inválida'); 
+    }
 }

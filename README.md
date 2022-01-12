@@ -51,7 +51,6 @@ Genera los registros de Usuario Administrador y uno de prueba
 php artisan db:seed
 
 
-
 ## running in heroki
 
 [Click Here](https://radiant-earth-84938.herokuapp.com)

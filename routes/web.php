@@ -38,7 +38,8 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 Route::prefix('admin')->group(function () {   
 
-    Route::get('/exp/{action}', 'App\Http\Controllers\EvaluadosController@exp');
+    Route::get('/repo/{action}', 'App\Http\Controllers\admin\DncsController@repo');
+    Route::get('/exp/{action}', 'App\Http\Controllers\admin\DncsController@exp');
 
     Route::get('/importUsuarios', 'App\Http\Controllers\admin\UsuariosController@indeximport');
     Route::post('/importUsuarios/import', 'App\Http\Controllers\admin\UsuariosController@import');
