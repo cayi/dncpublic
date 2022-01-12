@@ -473,7 +473,7 @@
 ?>
 > 
 <br>
-<input type="submit" class="btn btn-success" value="{{$modo}} Datos">
+@include('include.grabarbtn')
 <a href="{{ url('/admin/Dncs') }}" class="btn btn-primary"  > Regresar </a>
 <br>
 <input type="hidden" id="activao" name= "activao" value="{{ $dncs->activo }}">

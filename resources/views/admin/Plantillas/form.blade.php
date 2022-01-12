@@ -89,9 +89,9 @@
 ?>
 > 
 <br>
-<input type="submit" class="btn btn-success" value="{{$modo}} Datos">
+@include('include.grabarbtn')
 <a href="{{ url('/admin/Plantillas') }}" class="btn btn-primary"  > Regresar </a>
 <br>
-<input type="hidden" id="activao" name= "activao" value="{{ $plantillas->activo }}">
+<input type="hidden" id="activao" name= "activao" value="{{ $plantillas->activa }}">
 </div>
 @include('include.jsactiva')
