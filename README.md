@@ -67,7 +67,6 @@ Se intenta utilizar las mejores practicas como son:
  NO usar mayusculas entre medio de los nombres de Repositorios o Modelos
 usar MAYUSCULAS a la hora de importar formatos DNCs, quitar los acentos
 en lasl columnas dep_o_ent, unidad_admva y area, ya que habrá problemas en los filtrox
- 
 
 pra subir a la nube
 git add .

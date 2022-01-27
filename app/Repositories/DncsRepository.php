@@ -918,7 +918,7 @@ class DncsRepository extends Controller
             ->where('dncs.area', '<=',$request->areafin)
             ->GroupBy('dep_o_ent')
             ->selectRaw('count(id) as total, dep_o_ent')
-            ->get();       
+            ->get();
 
         if(count($dncs) < 1) 
         {
