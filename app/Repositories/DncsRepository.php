@@ -20,7 +20,37 @@ use App\Exports\UsersExport;
 use App\Exports\DncsExport;
 use App\Exports\PlantillasExport;
 
+/*
+//Step 1: Load KoolReport
+require_once "../vendor/koolreport/core/src/koolreport.php";
 
+//Step 2: Creating Report class
+class MyReport extends \koolreport\KoolReport
+{
+    protected function settings()
+    {
+        return array(
+            "dataSources"=>array(
+                "data"=>array(
+                    "class"=>'\koolreport\datasources\ArrayDataSource',
+                    "dataFormat"=>"table",
+                    "data"=>array(
+                        array("name","age","income"),
+                        array("John",26,50000),
+                        array("Marry",29,60000),
+                        array("Peter",34,100000),
+                        array("Donald",28,80000),
+                    )
+                )
+            )
+        );
+    }
+    protected function setup()
+    {
+        $this->src("data")->pipe($this->dataStore("data"));
+    }    
+}
+*/
 class DncsRepository extends Controller
 {
     private $model;
@@ -688,5 +718,223 @@ class DncsRepository extends Controller
             return Excel::download(new PlantillasExport, 'plantillas.xlsx');        
         }
         return ('Opción Inválida'); 
+    }
+
+    public function reportes( $repo) 
+    {
+    $periodos           = $this->periodos();
+    //$dncs               = $this->all();
+    if ($repo == "1")
+          {
+            return "En proceso reporte de Usuarios";
+          }
+    if ($repo == "2")
+          {            
+            return $this->repo_dnc();
+          }
+    if ($repo == "3")
+          {
+            return "En proceso reporte de Plantillas";
+         }          
+    }
+
+    public function dependencias()
+    {           
+        return Dncs::all()->sortBy("dep_o_ent")->unique("dep_o_ent");
+    }
+    public function unidades()
+    {   
+        return Dncs::all()->sortBy("unidad_admva")->unique("unidad_admva");
+    }
+    public function areas()
+    {   
+        return Dncs::all()->sortBy("area")->unique("area");
+    }
+    public function First()
+    {             
+        return( $this->model->First());
+    }
+    public function repo_dnc()
+    {           
+        $dncs =  $this->First();
+
+        $dependencia = $this->dependencias();
+        $unidad = $this->unidades();
+        $area = $this->areas();
+
+        $periodo = $this->periodos();
+            
+        $periodo_ini = $periodo->First()->cve_periodo;
+        $periodo_fin = $periodo->Last()->cve_periodo;
+    
+        $dependencia_ini = $dependencia->First()->dep_o_ent;
+        $dependencia_fin = $dependencia->Last()->dep_o_ent;
+        //dd($dependencia_ini);
+        $unidad_ini = $unidad->First()->unidad_admva;
+        $unidad_fin = $unidad->Last()->unidad_admva;
+    
+        $area_ini = $area->First()->area;
+        $area_fin = $area->Last()->area;
+
+        //dd("ok");
+        return view('admin/Dncsrepos',
+            compact('dependencia','unidad','area','dncs','periodo',
+            'periodo_ini','periodo_fin',
+            'dependencia_ini','dependencia_fin',
+            'unidad_ini','unidad_fin',
+            'area_ini','area_fin'
+            ));        
+    } 
+    
+    public function dncsrepodet( Request $request)
+    {
+        if ($request->num_emp> "0") 
+        {            
+            $dncs = DB::table('dncs')
+            ->join('plantillas', 'plantillas.id', '=', 'dncs.fk_id_plantillas')
+            ->join('periodos', 'periodos.cve_periodo', '=', 'dncs.fk_cve_periodo')            
+            ->orderBy('dncs.num_emp', 'ASC')
+            ->orderBy('dncs.fk_cve_periodo', 'DESC')
+            ->where('dncs.fk_cve_periodo', '>=',$request->periodoini)
+            ->where('dncs.fk_cve_periodo', '<=',$request->periodofin)
+            ->where('dncs.dep_o_ent', '>=',$request->dependenciaini)
+            ->where('dncs.dep_o_ent', '<=',$request->dependenciafin)
+            ->where('dncs.unidad_admva', '>=',$request->unidadini)
+            ->where('dncs.unidad_admva', '<=',$request->unidadfin)
+            ->where('dncs.area', '>=',$request->areaini)
+            ->where('dncs.area', '<=',$request->areafin)
+            ->where('dncs.num_emp', '=',$request->num_emp)
+            ->select(
+                'dncs.id',
+                'dncs.fk_id_plantillas',
+                'dncs.fk_cve_periodo',
+                'dncs.num_emp',
+                'dncs.nombre_completo',
+                'dncs.dep_o_ent',
+                'dncs.unidad_admva',
+                'dncs.area',
+                'dncs.grado_est',
+                'dncs.correo',
+                'dncs.telefono',
+                'dncs.funciones',
+                'dncs.word_int',
+                'dncs.word_ava',
+                'dncs.excel_int',
+                'dncs.excel_ava',
+                'dncs.power_point',
+                'dncs.nuevas_tec',
+                'dncs.acc_institucionales',
+                'dncs.acc_des_humano',
+                'dncs.acc_administrativas',
+                'dncs.otro_curso',
+                'dncs.tema',
+                'dncs.activo',            
+                'periodos.descripcion as periodo_descripcion')                
+            ->get();
+            //dd($request->unidad_fin);
+            //dd($dncs);
+
+        } else 
+        {                
+            $dncs = DB::table('dncs')
+            ->join('plantillas', 'plantillas.id', '=', 'dncs.fk_id_plantillas')
+            ->join('periodos', 'periodos.cve_periodo', '=', 'dncs.fk_cve_periodo')            
+            ->orderBy('dncs.num_emp', 'ASC')
+            ->orderBy('dncs.fk_cve_periodo', 'DESC')
+            ->where('dncs.fk_cve_periodo', '>=',$request->periodoini)
+            ->where('dncs.fk_cve_periodo', '<=',$request->periodofin)
+            ->where('dncs.dep_o_ent', '>=',$request->dependenciaini)
+            ->where('dncs.dep_o_ent', '<=',$request->dependenciafin)
+            ->where('dncs.unidad_admva', '>=',$request->unidadini)
+            ->where('dncs.unidad_admva', '<=',$request->unidadfin)
+            ->where('dncs.area', '>=',$request->areaini)
+            ->where('dncs.area', '<=',$request->areafin)
+            ->select(
+                'dncs.id',
+                'dncs.fk_id_plantillas',
+                'dncs.fk_cve_periodo',
+                'dncs.num_emp',
+                'dncs.nombre_completo',
+                'dncs.dep_o_ent',
+                'dncs.unidad_admva',
+                'dncs.area',
+                'dncs.grado_est',
+                'dncs.correo',
+                'dncs.telefono',
+                'dncs.funciones',
+                'dncs.word_int',
+                'dncs.word_ava',
+                'dncs.excel_int',
+                'dncs.excel_ava',
+                'dncs.power_point',
+                'dncs.nuevas_tec',
+                'dncs.acc_institucionales',
+                'dncs.acc_des_humano',
+                'dncs.acc_administrativas',
+                'dncs.otro_curso',
+                'dncs.tema',
+                'dncs.activo',            
+                'periodos.descripcion as periodo_descripcion')
+            ->get();            
+        } // ENDIF
+        //dd($dncs);
+        if(count($dncs) < 1) 
+        {
+            $err = 'Error: No se encontró ningún Formato DNC con las condiciones: No. de empleado='. 
+                $request->num_emp. 
+                ", dependencia>=". $request->dependenciaini.
+                " y dependencia<=".$request->dependenciafin. 
+                ", UA >=".$request->unidadini.
+                "y  UA <=".$request->unidadfin.
+                ", area >=".$request->areani.
+                "y  area <=".$request->areafin.
+                ", periodo inicial >=".
+                $request->periodoini." y periodo final<=".$request->periodofin;
+            return back()->with('mensaje', $err);
+        } else 
+        {
+            return view('admin/Dncsreporte',compact('dncs'));
+        }
+    }
+    public function dncsrepo( Request $request)
+    {
+        // clic en reporte detallado?
+        if (isset($request->repodet)) {
+            return $this->dncsrepodet( $request);
+        } else {
+            return $this->dncsrepodep( $request);            
+        }   
+    }  
+    public function dncsrepodep( Request $request)
+    {
+       $dncs = DB::table('dncs')
+            ->where('dncs.fk_cve_periodo', '>=',$request->periodoini)
+            ->where('dncs.fk_cve_periodo', '<=',$request->periodofin)
+            ->where('dncs.dep_o_ent', '>=',$request->dependenciaini)
+            ->where('dncs.dep_o_ent', '<=',$request->dependenciafin)
+            ->where('dncs.unidad_admva', '>=',$request->unidadini)
+            ->where('dncs.unidad_admva', '<=',$request->unidadfin)
+            ->where('dncs.area', '>=',$request->areaini)
+            ->where('dncs.area', '<=',$request->areafin)
+            ->GroupBy('dep_o_ent')
+            ->selectRaw('count(id) as total, dep_o_ent')
+            ->get();       
+
+        if(count($dncs) < 1) 
+        {
+            $err = 'Error: No se encontró ningún Formato DNC con las condiciones: '.
+                " dependencia>=". $request->dependenciaini.
+                " y dependencia<=".$request->dependenciafin. 
+                ", UA >=".$request->unidadini.
+                "y  UA <=".$request->unidadfin.
+                ", area >=".$request->areani.
+                "y  area <=".$request->areafin.
+                ", periodo inicial >=".
+                $request->periodoini." y periodo final<=".$request->periodofin;
+            return back()->with('mensaje', $err);
+        } else 
+        {
+            return view('admin/Dncsrepodep',compact('dncs'));
+        }
     }
 }

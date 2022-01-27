@@ -47,35 +47,3 @@ class PlantillasImport implements ToModel, WithHeadingRow, WithChunkReading
         return 5000;
     }
 }
-
-/*
-class PlantillasImport implements ToCollection, WithHeadingRow, WithChunkReading
-{
-    public function collection(Collection $rows)
-    {
-        foreach ($rows as $row) 
-        {
-            Plantillas::create([
-                'num_emp'           => $row['num_emp'],
-                'nombre_completo'   => $row['nombre_completo'],
-                'sexo'              => $row['sexo'],
-                'nivel'             => $row['nivel'],
-                'dependencia'       => $row['dependencia'],
-                'unidad_admva'      => $row['unidad_admva'],
-                'puesto'            => $row['puesto'],
-                'municipio'         => $row['municipio'],
-                'plaza'             => $row['plaza'],
-                'tipo_plaza'        => $row['tipo_plaza'],
-                'fuente'            => $row['fuente'],
-                'plantilla'         => $row['plantilla'],
-                'tipo_org'          => $row['tipo_org'],
-                'num_plaza'         => $row['num_plaza'],
-            ]);
-        }
-    }
-    public function chunkSize(): int
-    {
-        return 5000;
-    }
-    */
-}

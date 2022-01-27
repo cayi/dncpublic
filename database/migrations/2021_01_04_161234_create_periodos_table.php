@@ -10,7 +10,7 @@ class CreatePeriodosTable extends Migration
     {
         Schema::create('periodos', function (Blueprint $table) {
             $table->id();
-            $table->string('cve_periodo',3)->default("210")->unique();
+            $table->string('cve_periodo',3)->default("211")->unique();
             $table->string('descripcion',120)->default("EJERCICIO 2021");
             $table->boolean('activo')->default(true);
             $table->timestamp('fecha_ini')->default("20210101")->nullable();

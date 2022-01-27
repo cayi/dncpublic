@@ -20,10 +20,7 @@ class PerfilusersRepository extends Controller
     }
      public function all()
     {
-        //dd("hey");
         $all = $this->model->orderBy('cve_perfil_usuario', 'asc')->paginate(5);
-        //$all = $this->model->orderBy('cve_perfil_usuario', 'asc');
-        //dd($all);
         return( $all);
     }
     public function edit($id)

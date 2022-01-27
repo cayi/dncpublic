@@ -65,6 +65,8 @@ Se intenta utilizar las mejores practicas como son:
  NO usar giones bajos en los nombres de las tablas
  USAR la letra s al final de los nombres de las tablas (probar)
  NO usar mayusculas entre medio de los nombres de Repositorios o Modelos
+usar MAYUSCULAS a la hora de importar formatos DNCs, quitar los acentos
+en lasl columnas dep_o_ent, unidad_admva y area, ya que habrá problemas en los filtrox
  
 
 pra subir a la nube
@@ -116,7 +118,6 @@ Se intenta utilizar las mejores practicas como son:
  Usa Laravel 8.0
  Importa / Exporta archivos de Excel modernos XLSX y antiguos XLS
  Soporta borrado logico de registros SOFTDELETES
- Usa livewire para importar archivos grandes de Excel, informa al usuario el avance.
 
  
 

@@ -17,22 +17,12 @@ use App\Models\Periodos;
 
 use App\Imports\PlantillasImport;
 
-use App\Jobs\ImportJob;
-use Livewire\Component;
-use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 
 class PlantillasRepository extends Controller
 {
-  use WithFileUploads;
-
-  public $batchId;
-  public $importFile;
-  public $importing = false;
-  public $importFilePath;
-  public $importFinished = false;
-
+    //use WithFileUploads;
 
     private $model;
     public function __construct()
@@ -249,7 +239,7 @@ class PlantillasRepository extends Controller
       } // end if ($clean)
       else 
       {
-        $this->import_old( $request);
+        return $this->import_old( $request);
       } // end else $clean == 'Limpiar'
     } // end import function  
     public function get_user_data() 
@@ -299,20 +289,39 @@ class PlantillasRepository extends Controller
         $this->batchId = $batch->id;
         //dd("hey");
     }
-
+  
   public function import_old( Request $request)
   {
-   // $datos= $this->get_user_data();
-   //ini_set('memory_limit', '-1');
+    // $datos= $this->get_user_data();
+    //ini_set('memory_limit', '-1');
 
-   $this->validate($request, 
-      [ 'select_file'  => 'required|mimes:xls,xlsx'   ], 
-      [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx' ]
+    $this->validate($request, 
+      [ 'select_file'  => 'required|mimes:xls,xlsx,csv'   ], 
+      [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx, o delimitado por comas csv' ]
     );
     $path1 = $request->file('select_file')->store('temp'); 
-    $path = storage_path('app').'/'.$path1;          
+    $path = storage_path('app').'/'.$path1;
+    if (strpos($path, "xls")) {
+      return  $this->import_excel( $request, $path);
+    }
+    dd($path);
     try {
+    
+    } 
+    catch (\Illuminate\Database\QueryException $e) 
+    {
+        return back()->with('success', 'Ocurrió un error:  '.$e->errorInfo[2]);
+    } // end catch
+  }
+
+  public function import_excel( Request $request, $path)
+  {           
+    //dd("xls");
       //dd($path1);
+      ini_set('memory_limit', '-1');
+      set_time_limit(1600);
+      //ini_set('max_execution_time', 120); 
+      //set_time_limit(0);
       $data = Excel::toCollection(new PlantillasImport, $path); 
       //dd($path1);
       //$data = Excel::import(new PlantillasImport, $path);
@@ -400,14 +409,9 @@ class PlantillasRepository extends Controller
       $msg = 'El archivo de Plantillas de Excel se subió con éxito. '.
       "Se repitieron ".$existentes." registro(s)".
       " y se subieron ".$suma. " registro(s).";
-      dd($msg);
-      return back()->with('success', $msg);
+      //dd($msg);
+      return back()->with('success', $msg);      
       //$data = Excel::import(new UsersImport,$path);
-      //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');
-    } 
-    catch (\Illuminate\Database\QueryException $e) 
-    {
-        return back()->with('success', 'Ocurrió un error:  '.$e->errorInfo[2]);
-    } // end catch
-  }
+      //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');    
+  } 
 }

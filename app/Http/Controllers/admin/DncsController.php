@@ -95,25 +95,11 @@ class DncsController extends Controller
         return $this->dncsRepository->get_user_data();        
       }
     }
-    
     function repo( $repo)
     { 
       if ( $this->dncsRepository->es_administrador() == "Si") 
       {
-          $periodos           = $this->dncsRepository->periodos();
-          $dncs               = $this->dncsRepository->all();
-          if ($repo == "1")
-          {
-            return "En proceso reporte de Usuarios";
-          }
-          if ($repo == "2")
-          {
-            return "En proceso reporte de Formatos DNCs";
-          }
-          if ($repo == "3")
-          {
-            return "En proceso reporte de Plantillas";
-          }          
+          return $this->dncsRepository->reportes( $repo);
       }
       else
       {        
@@ -130,5 +116,9 @@ class DncsController extends Controller
         {        
           return $this->dncsRepository->get_user_data();
         }
+    }
+    function dncsrepo( Request $request)
+    {
+        return $this->dncsRepository->dncsrepo( $request);
     }
 }

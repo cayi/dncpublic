@@ -5,11 +5,11 @@
        @foreach($dependencia as $dep)
        <option value="{{ $dependencia_ini }}" 
        <?php                   
-           if( $dep->cve_dependencia == $dependencia_ini) 
+           if( $dep->dep_o_ent == $dependencia_ini) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $dep->cve_dependencia." ".$dep->descripcion }}
+       {{ $dep->dep_o_ent }}
        </option>
        @endforeach            
 </select> 
@@ -21,11 +21,11 @@
        @foreach($dependencia as $dep)
        <option value="{{ $dependencia_fin }}" 
        <?php                   
-           if( $dep->cve_dependencia == $dependencia_fin) 
+           if( $dep->dep_o_ent == $dependencia_fin) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $dep->cve_dependencia." ".$dep->descripcion  }}
+       {{ $dep->dep_o_ent  }}
        </option>
        @endforeach            
 </select>
@@ -37,11 +37,11 @@
        @foreach($unidad as $uni)
        <option value="{{ $unidad_ini }}" 
        <?php                   
-           if( $uni->cve_unidad == $unidad_ini) 
+           if( $uni->unidad_admva == $unidad_ini) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $uni->cve_unidad." ".substr($uni->descripcion,0,80) }}
+       {{ $uni->unidad_admva }}
        </option>
        @endforeach            
 </select> 
@@ -53,11 +53,11 @@
        @foreach($unidad as $uni)
        <option value="{{ $unidad_fin }}" 
        <?php                   
-           if( $uni->cve_unidad == $unidad_fin) 
+           if( $uni->unidad_admva == $unidad_fin) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $uni->cve_unidad." ".substr($uni->descripcion,0,80) }}
+       {{ $uni->unidad_admva }}
        </option>
        @endforeach
 </select>
@@ -69,11 +69,11 @@
        @foreach($area as $are)
        <option value="{{ $area_ini }}" 
        <?php                   
-           if( $are->cve_area == $area_ini) 
+           if( $are->area == $area_ini) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $are->cve_area." ".substr($are->descripcion,0,80) }}
+       {{ $are->area }}
        </option>
        @endforeach            
 </select> 
@@ -85,11 +85,11 @@
        @foreach($area as $are)
        <option value="{{ $area_fin }}" 
        <?php                   
-           if( $are->cve_area == $area_fin) 
+           if( $are->area == $area_fin) 
                echo 'selected="selected"'                
        ?>                     
        > 
-       {{ $are->cve_area." ".substr($are->descripcion,0,80) }}
+       {{ $are->area }}
        </option>
        @endforeach
 </select>
@@ -108,7 +108,7 @@
 <select name="dependencias" id="dependencias" disabled>
        @foreach($dependencia as $dep)
        <option value="{{ $dependencia_ini }}" >       
-       {{ $dep->cve_dependencia." ".substr($dep->descripcion,0,80) }}
+       {{ $dep->dep_o_ent }}
        </option>
        @endforeach
 </select> 
@@ -116,14 +116,14 @@
 <select name="unidades" id="unidades" disabled>
        @foreach($unidad as $uni)
        <option value="{{ $unidad_ini }}" >       
-       {{ $uni->cve_unidad." ".substr($uni->descripcion,0,80) }}
+       {{ $uni->unidad_admva }}
        </option>
        @endforeach 
 </select> 
 <select name="areas" id="areas" disabled>
        @foreach($area as $are)
        <option value="{{ $area_ini }}" >
-       {{ $are->cve_area." ".substr($are->descripcion,0,80) }}
+       {{ $are->area }}
        </option>
        @endforeach            
 </select> 

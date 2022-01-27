@@ -11,7 +11,7 @@ class CreateDNCsTable extends Migration
         Schema::create('dncs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('fk_id_plantillas');
-            $table->string('fk_cve_periodo',3)->default("210");
+            $table->string('fk_cve_periodo',3)->default("211");
             $table->bigInteger('num_emp');
             //  nota los siguientes campos quedarian fuera una vez ligada a plantillas
             $table->string('nombre_completo',80);
@@ -38,6 +38,8 @@ class CreateDNCsTable extends Migration
             $table->boolean('activo')->default(true);
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('fk_cve_periodo')->references('cve_periodo')->
+            on('periodos')->onDelete('cascade');
             $table->foreign('fk_id_plantillas')->references('id')->
             on('plantillas')->onDelete('cascade');
         });

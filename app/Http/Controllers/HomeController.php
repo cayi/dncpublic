@@ -30,17 +30,4 @@ class HomeController extends Controller
             return view('home');
         }      
     }
-    /*
-    public function import(Request $request)
-    {
-        dd("hey");
-        $request->validate([
-            'import_file' => 'required',
-        ]);
-
-        Excel::import(new PlantillasImport, request()->file('import_file'));
-
-        return back()->withStatus('Importacion terminada!');
-    }
-    */
 }

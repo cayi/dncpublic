@@ -26,17 +26,9 @@ Auth::routes([
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-//Route::get('/evaluadores/pdf', 'App\Http\Controllers\EvaluadoresController@imprime');
-//Route::post('/eva/grabar', 'App\Http\Controllers\EvaluadosController@grabar');
-//Route::get('/eva/{id}', 'App\Http\Controllers\EvaluadosController@eva');
-//Route::get('/eva2', 'App\Http\Controllers\EvaluadoresController@eva2');
-//Route::get('/val/{id}', 'App\Http\Controllers\EvaluadosController@val');
-//Route::get('/evaluadores', 'App\Http\Controllers\EvaluadoresController@index');
-
-//Route::post('import', [HomeController::class, 'import'])->name('import');
-//Route::post('import', 'App\Http\Controllers\HomeController@import');
-
 Route::prefix('admin')->group(function () {   
+
+    Route::post('Dncsrepos/repo', 'App\Http\Controllers\admin\DncsController@dncsrepo');
 
     Route::get('/repo/{action}', 'App\Http\Controllers\admin\DncsController@repo');
     Route::get('/exp/{action}', 'App\Http\Controllers\admin\DncsController@exp');

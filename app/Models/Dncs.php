@@ -11,15 +11,36 @@ class Dncs extends Model
     use HasFactory;
     use SoftDeletes;
     protected $fillable = [
+        'fk_id_plantillas',
         'fk_cve_periodo',
-        'fk_num_emp',
-        'tot_evaluar',
-        'tot_evaluado',
-        'pen_evaluar',
-        'fk_cve_area',
-        'puesto',
-    ];   
-    public function users () {
-        return $this->hasMany(User::Class);
+        'num_emp',
+        'nombre_completo',
+        'dep_o_ent',
+        'unidad_admva',
+        'area',
+        'grado_est',
+        'correo',
+        'telefono',
+        'funciones',
+        'word_int',
+        'word_ava',
+        'excel_int',
+        'excel_ava',
+        'power_point',
+        'nuevas_tec',
+        'acc_institucionales',
+        'acc_des_humano',
+        'acc_administrativas',
+        'otro_curso',
+        'interes_instructor',
+        'tema',
+        'activo',
+    ]; 
+    
+    public function plantillas() {
+        return $this->hasMany(Plantillas::Class);
+    }
+    public function periodos() {
+        return $this->hasMany(Periodos::Class);        
     }
 }

@@ -15,7 +15,7 @@ class UsersSeeder extends Seeder
             'fk_cve_perfil_usuario' => 'A',
             'name' => 'ADMINISTRADOR DEL SISTEMA',
             'email' => 'admin@gmail.com',
-            'password' => Hash::make('admin'),
+            'password' => Hash::make('4dm1n'),
         ]);
         DB::table('users')->insert([    
             'fk_cve_perfil_usuario' => 'U',

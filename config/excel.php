@@ -120,6 +120,7 @@ return [
         | Configure e.g. delimiter, enclosure and line ending for CSV imports.
         |
         */
+        /*
         'csv'         => [
             'delimiter'        => ',',
             'enclosure'        => '"',
@@ -127,7 +128,14 @@ return [
             'contiguous'       => false,
             'input_encoding'   => 'UTF-8',
         ],
-
+*/
+        'csv'         => [
+        'delimiter'        => ',',
+        'enclosure'        => '"',
+        'escape_character' => '\\',
+        'contiguous'       => false,
+        'input_encoding'   => 'UTF-8',
+        ],
         /*
         |--------------------------------------------------------------------------
         | Worksheet properties
