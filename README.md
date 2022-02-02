@@ -89,6 +89,27 @@ php artisan db:seed
 
 ## running in heroku
 
+Crear un proyecto nuevo en HEROKU 
+en este caso se llama fodnc
+Se amarra con el repositorio de github, en este caso cayi/dnc
+Se crea una Pipeline, pero dentro de la pipeline esta una staggin
+que es el icono de Hexagonal, aqui se ponen las variables de ambiente
+que usara Laravel para conectarse a la base de datos, estas variables son:
+
+APP_DEBUG true
+APP_ENV production
+APP_KEY base64:n/raCwFkyD2o2OthF8whDaXFwRX07odsAeRJBcFgFqA=
+APP_NAME fodnc
+APP_URL https://fondc.heroku.com
+DB_CONNECTION pgsql
+DB_PORT 5432
+DB_HOST aaaa
+DB_DATABASE xxx
+DB_USERNAME yyyyy
+DB_PASSWORD zzzz
+DB_URL xxxyyzzzz
+
+
 [Click Here](https://radiant-earth-84938.herokuapp.com)
 
 ## heroku CLI to go the bash
@@ -198,7 +219,7 @@ php artisan db:seed
 `$heroku git:remote -a dnc
 
 `heroku run bash
-php artisan migrate:refresh  
-php artisan db:seed 
+php artisan migrate:fresh  --seed
+
 
 
