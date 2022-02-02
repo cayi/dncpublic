@@ -53,7 +53,7 @@ class UsuariosController extends Controller
       if ( $this->usuariosRepository->es_administrador() == "Si") 
       {
           $usuarios = $this->usuariosRepository->all();
-          return view('/admin/Usuarios/import', compact('usuarios'));
+          return view('/admin/Usuarios/Import', compact('usuarios'));
       }
       else
       {        
