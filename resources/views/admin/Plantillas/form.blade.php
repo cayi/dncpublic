@@ -1,15 +1,5 @@
 <h1> {{$modo}} Plantillas</h1>
-@if(count($errors)>0)
-    <div class="alert alert-danger" role="alert">
-        <ul>
-            @foreach($errors->all() as $error)
-                <li> {{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-
-
+@include('include.formerrors')
 <br>
 <div class="form-group">
 <label  class="d-inline" for="num_emp"> Número de Empleado: </label>

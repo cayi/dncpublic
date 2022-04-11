@@ -11,6 +11,7 @@ use Auth;
 use Excel;
 
 use App\Models\Dncs;
+use App\Models\Plantillas;
 use App\Models\Perfilusers;
 use App\Models\User;
 use App\Models\Periodos;
@@ -20,44 +21,20 @@ use App\Exports\UsersExport;
 use App\Exports\DncsExport;
 use App\Exports\PlantillasExport;
 
-/*
-//Step 1: Load KoolReport
-require_once "../vendor/koolreport/core/src/koolreport.php";
-
-//Step 2: Creating Report class
-class MyReport extends \koolreport\KoolReport
-{
-    protected function settings()
-    {
-        return array(
-            "dataSources"=>array(
-                "data"=>array(
-                    "class"=>'\koolreport\datasources\ArrayDataSource',
-                    "dataFormat"=>"table",
-                    "data"=>array(
-                        array("name","age","income"),
-                        array("John",26,50000),
-                        array("Marry",29,60000),
-                        array("Peter",34,100000),
-                        array("Donald",28,80000),
-                    )
-                )
-            )
-        );
-    }
-    protected function setup()
-    {
-        $this->src("data")->pipe($this->dataStore("data"));
-    }    
-}
-*/
 class DncsRepository extends Controller
 {
     private $model;
+    private $plantilla;
+    private $ultimo_periodo;
     public function __construct()
     {        
         $this->model = New Dncs();
+        $this->plantilla = DB::table('plantillas')                                
+            ->where('plantillas.id', '=', "1")
+            ->get();
+        $this->ultimo_periodo = $this->ultimo_periodo();
     }
+    
     public function get_user_data() 
     {
       $datos=[
@@ -160,27 +137,52 @@ class DncsRepository extends Controller
     }
     public function periodos()
     {        
-        return( Periodos::all()->SortBy('cve_perdiodo'));
+        return( Periodos::all()->SortBy('cve_periodo'));
+    }
+    public function ultimo_periodo()
+    {                
+        return( DB::table('periodos')->orderBy('id', 'desc')
+        ->where('periodos.activo', '=', true)
+        ->first());
+    }
+    public function dependencias_de_plantillas()
+    {                
+        return( Plantillas::select('dependencia')->distinct()->get());
     }
     public function all()
     {   
-        return( $this->model->orderBy('num_emp', 'asc')->paginate(5));
+        //return( $this->model->orderBy('num_emp', 'asc')->paginate(5));
+        return( $this->model->orderBy('id', 'asc')->paginate(5));
     }
     public function dncs_blank(){
-        $dncs = Dncs::FindOrFail(1);        
+        $ult_per = $this->ultimo_periodo(); 
+        //dd($ult_per);
+        $dncs = Dncs::FindOrFail(1);
+        // obtiene el ultimo periodo de la tabla
+        $dncs->fk_cve_periodo= $ult_per->cve_periodo;
+        $dncs->num_emp= "";        
+        $dncs->nombre_completo= "";
+        $dncs->dep_o_ent= "";
+        $dncs->unidad_admva= "";        
+        $dncs->area= "";
+        $dncs->grado_est= "";
+        $dncs->correo= "";
+        $dncs->telefono= "";
+        $dncs->funciones= ""; 
         $dncs->activo = true;
+        $dncs->word_int= "";
+        $dncs->word_ava= "";
+        $dncs->excel_int= "";
+        $dncs->excel_ava= "";
+        $dncs->power_point= "";
+        $dncs->nuevas_tec= "";
+        $dncs->acc_institucionales= "";
+        $dncs->acc_des_humano= "";
+        $dncs->acc_administrativas= "";
+        $this->model = $dncs;
         return ( $dncs);
     }
-    public function insert( Request $request)
-    {
-        $campos=        $this->get_campos_val();
-        $mensajes=      $this->get_mensajes_val();
-        //dd($request);
-        $this->validate( $request, $campos, $mensajes);
-        $dncs= $this->fix_datos_dncs( $request);
-        //dd( $dncs);
-        $this->model->insert( $dncs);
-    }
+    
     private function fix_datos_dncs( $request) 
     {
         // elimina la variables _token , _method, y activao
@@ -386,10 +388,8 @@ class DncsRepository extends Controller
         //dd( $datos_dncs);        
         return ($datos_dncs);
     }
-    public function edit( $id)
-    {             
-        $this->model = $this->model->FindOrFail( $id);
-        //dd( $this->model->getAttribute('word_init'));
+    public function set_attributes()
+    {
         $arreglo = $this->model->getAttributes();
         //dd( $arreglo);
         if ( strpos( $arreglo['word_int'], "Tablas en Word.") !== false) {
@@ -509,6 +509,12 @@ class DncsRepository extends Controller
         if ( strpos( $arreglo['acc_administrativas'], "Otro.") !== false) {
             $this->model->setAttribute("acc_administrativas_otro","1");
         }
+    }
+    public function edit( $id)
+    {             
+        $this->model = $this->model->FindOrFail( $id);
+        //dd( $this->model->getAttribute('word_init'));
+        $this->set_atributes();
         //dd( $this->model);
         return ( $this->model );
     }
@@ -572,6 +578,10 @@ class DncsRepository extends Controller
             'funciones.max'=>'Las Funciones deben tener como máximo 500 caracteres.',        
         ];
         return $mensajes;
+    }
+    public function delete( $id)
+    {        
+        $this->model->destroy($id);
     }
     public function import(Request $request) 
     {
@@ -875,7 +885,7 @@ class DncsRepository extends Controller
                 'dncs.tema',
                 'dncs.activo',            
                 'periodos.descripcion as periodo_descripcion')
-            ->get();            
+            ->get();
         } // ENDIF
         //dd($dncs);
         if(count($dncs) < 1) 
@@ -937,4 +947,299 @@ class DncsRepository extends Controller
             return view('admin/Dncsrepodep',compact('dncs'));
         }
     }
+    
+    public function plantilla()
+    {
+        return $this->plantilla;
+    }
+    public function get_model() 
+    {
+        return $this->model;
+    }
+
+    public function searchmain()
+    {
+        if ($this->dncsRepository->search($request)=="SI" ) {
+            $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
+            $usuarios           = $this->dncsRepository->usuarios();
+            $periodos           = $this->dncsRepository->periodos();
+            // pone el ultimo periodo activo registrado
+            // y agrega los datos de la plabtilla
+            $dncs               = $this->dncsRepository->get_model();
+            //dd($dncs);
+            return view('admin/Dncs.createval', compact(
+                'usuarios',
+                'perfil_usuarios',
+                'periodos',
+                'dncs'
+              ));
+          }
+          else {
+            return redirect("/admin/Dncs")->with('mensaje','Empleado no localizado.');
+          }
+    }
+    public function createval() 
+    {
+        // otros datos
+        $perfil_usuarios    = $this->perfil_usuarios();
+        $usuarios           = $this->usuarios();
+        $periodos           = $this->periodos();
+        $des_uper           = $this->ultimo_periodo->descripcion;
+        // y agrega los datos de la plabtilla
+        $dncs               = $this->get_model();
+        //dd($dncs);
+        //dd('createval');
+        return view('admin/Dncs.createval', compact(
+            'des_uper',
+            'usuarios',
+            'perfil_usuarios',
+            'periodos',
+            'dncs'
+        ));      
+    }
+    public function search(Request $request) 
+    {     
+      //dd($request);
+      $num_emp = trim($request->num_emp);
+      $dep_o_ent = trim($request->dependencia);
+      $plan = DB::table('plantillas')
+        ->orderBy('plantillas.num_emp', 'ASC')
+        ->where('plantillas.dependencia', '=', $dep_o_ent)
+        ->where('plantillas.num_emp', '=', $num_emp)
+        ->get();
+      //dd("|".$num_emp."|".$dep_o_ent."|");
+      //dd($plan);
+      if( count($plan) > 0)
+      {
+        //dd("count(plan) > 0y");
+        $this->plantilla = $plan;
+        $this->model->fk_id_plantillas  = $this->plantilla[0]->id;
+        $this->model->num_emp           = $this->plantilla[0]->num_emp;
+        $this->model->nombre_completo   = $this->plantilla[0]->nombre_completo;
+        $this->model->dep_o_ent         = $this->plantilla[0]->dependencia;
+        $this->model->unidad_admva      = $this->plantilla[0]->unidad_admva;
+        
+        $udnc = DB::table('dncs')
+            ->orderBy('dncs.num_emp', 'ASC')
+            ->orderBy('dncs.fk_cve_periodo', 'DESC')
+            ->where('dncs.dep_o_ent', '=', $dep_o_ent)
+            ->where('dncs.deleted_at', '=', NULL)
+            ->where('dncs.num_emp', '=', $num_emp)
+            ->get();
+        // existe ak menos 1 formato DNC
+        //dd($udnc);
+        Session::forget('model');
+        Session::put('model', $this->model);
+        if( count($udnc) > 0)
+        {            
+            //dd('count($udnc) > 0');
+            //if ( udnc[0]->fk_cve_periodo == $uper->cve_periodo );
+            if( $udnc[0]->fk_cve_periodo == $this->ultimo_periodo->cve_periodo )
+            {
+                //dd("hey");
+                $err = 
+                "Ya existe un formato capturado para el periodo ='". $this->ultimo_periodo->descripcion.
+                "' y empleado numero = '".$num_emp. 
+                "' y dependencia = '".$dep_o_ent. "'.";
+                return back()->with('mensaje', $err);
+            }
+            else
+            {
+                // pasa los datos de la ultimo formato dnc
+                $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
+                $this->model->area              = $udnc[0]->area;
+                $this->model->grado_est         = $udnc[0]->grado_est;
+                $this->model->correo            = $udnc[0]->correo;
+                $this->model->telefono          = $udnc[0]->telefono;
+                $this->model->funciones         = $udnc[0]->funciones;
+                // opcional los datos anteriores
+                $this->model->word_int          = $udnc[0]->word_int;
+                $this->model->word_ava          = $udnc[0]->word_ava;
+                $this->model->excel_int         = $udnc[0]->excel_int;
+                $this->model->excel_ava         = $udnc[0]->excel_ava;
+                $this->model->power_point       = $udnc[0]->power_point;
+                $this->model->nuevas_tec        = $udnc[0]->nuevas_tec;
+                $this->model->acc_institucionales       = $udnc[0]->acc_institucionales;
+                $this->model->acc_des_humano    = $udnc[0]->acc_des_humano;
+                $this->model->acc_administrativas   = $udnc[0]->acc_administrativas;
+                $this->model->otro_curso        = $udnc[0]->otro_curso;
+                $this->model->interes_instructor        = $udnc[0]->interes_instructor;
+                $this->model->tema              = $udnc[0]->tema;
+                $this->model->activo            = true;
+                // pone el ultimo periodo activo registrado
+                Session::forget('model');
+                Session::put('model', $this->model);
+                //dd("model");
+                return $this->createval();
+            }
+        }
+        // no existe formato DNC
+        //dd("hey");
+        //return redirect("/admin/Dncs")->with('mensaje','Empleado no localizado en plantilla.');
+        //dd($request);
+        $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
+        $this->model->area              = '';
+        $this->model->grado_est         = '';
+        $this->model->correo            = '';
+        $this->model->telefono          = '';
+        $this->model->funciones         = '';
+        // opcional los datos anteriores
+        $this->model->word_int          = '';
+        $this->model->word_ava          = '';
+        $this->model->excel_int         = '';
+        $this->model->excel_ava         = '';
+        $this->model->power_point       = '';
+        $this->model->nuevas_tec        = '';
+        $this->model->acc_institucionales       = '';
+        $this->model->acc_des_humano    = '';
+        $this->model->acc_administrativas   = '';
+        $this->model->otro_curso        = '';
+        $this->model->interes_instructor        = '';
+        $this->model->tema              = '';;
+        $this->model->activo            = true;
+        Session::forget('model');
+        Session::put('model', $this->model);
+        return $this->createval();
+      }
+      // // if( count($plan) > 0), no se enocntr+o en plantilla
+      else  
+      {
+        $msg = 'Empleado con numero = '.$num_emp. 
+        " y dependencia = ".$dep_o_ent .
+        ', no pudo ser localizado en plantillas.';
+        //dd($msg);
+        return redirect("/admin/Dncs")
+            ->with('mensaje', $msg)
+            ->with('num_emp',$num_emp)
+            ->with('dep_o_ent',$dep_o_ent)
+            ;
+      }
+    }
+    // aqui brinca el boton de grabar/agregar
+    public function insert( Request $request)
+    {        
+        $this->request_to_model( $request);
+        
+        $campos=        $this->get_campos_val();
+        $mensajes=      $this->get_mensajes_val();
+        
+        // ES IMPORTANGE EL ORDEN DE LOS CAMPOS, que coincida $request con #campos
+        //$request->merge(['nombre_completo' => ' ']);
+
+        /*
+        // ERROR
+        $temp= $this->fix_datos_dncs( $request);
+        */
+        
+        //Session::forget('model');
+        //Session::put('model', $temp);
+
+        //dd($request);
+        $this->validate( $request, $campos, $mensajes);
+        //dd( "x");
+        $dncs= $this->fix_datos_dncs( $request);
+        //dd("yes");
+        //dd($dncs );
+        //$this->model =  $dncs; 
+ 
+        //dd($this->model );
+        dd('insert');
+        //$this->model->insert( $dncs);
+    }
+    public function Show( Request $request)
+    {
+        //dd('show');
+        if ( $this->es_administrador() == "Si") 
+        { 
+          return redirect("/admin/Dncs/create");
+        }
+        else
+        {                     
+            if (Session::has('model'))
+            {                
+                $this->session_to_model();                
+            }            
+            return $this->createval( $request);
+        }
+    }
+    private function session_to_model()
+    {
+        $model = Session::get('model');
+        Session::forget('model');
+        //dd($model['fk_cve_periodo']);
+        $this->model->fk_cve_periodo            = $model['fk_cve_periodo'];
+        $this->model->num_emp                   = $model['num_emp'];
+        $this->model->nombre_completo           = $model['nombre_completo'];
+        $this->model->dep_o_ent                 = $model['dep_o_ent'];
+        $this->model->unidad_admva              = $model['unidad_admva'];
+        $this->model->area                      = $model['area'];
+        $this->model->grado_est                = $model['grado_est'];
+        $this->model->correo                   = $model['correo'];
+        $this->model->telefono                 = $model['telefono'];
+        $this->model->funciones                = $model['funciones'];
+        $this->model->otro_curso               = $model['otro_curso'];
+        $this->model->interes_instructor       = $model['interes_instructor'];
+        $this->model->tema                     = $model['tema'];
+        $this->model->fk_id_plantillas         = $model['fk_id_plantillas'];
+        $this->model->activo                   = $model['activo'];
+        $this->model->word_int                 = $model['word_int'];
+        $this->model->word_ava                 = $model['word_ava'];
+        $this->model->excel_int                = $model['excel_int'];
+        $this->model->excel_ava                = $model['excel_ava'];
+        $this->model->power_point              = $model['power_point'];
+        $this->model->nuevas_tec               = $model['nuevas_tec'];
+        $this->model->acc_institucionales      = $model['acc_institucionales'];
+        $this->model->acc_des_humano           = $model['acc_des_humano'];        
+        $this->model->acc_administrativas      = $model['acc_administrativas'];
+        $this->set_attributes();
+        //dd($model);
+    }
+
+    private function request_to_model( $request)
+    {
+        
+        $this->model->fk_cve_periodo = $request->fk_cve_periodo;
+        $this->model->nombre_completo = $request->nombre_completo;
+        $this->model->num_emp = $request->num_emp;
+        $this->model->dep_o_ent = $request->dep_o_ent;
+        $this->model->unidad_admva = $request->unidad_admva;
+        $this->model->area = $request->area;
+        $this->model->grado_est = $request->grado_est;
+        $this->model->correo = $request->correo;
+        $this->model->telefono = $request->telefono;
+        $this->model->funciones = $request->funciones;
+        //$this->model->word_int_tablas = $request->word_int_tablas;
+        $this->model->excel_int_graficos = $request->excel_int_graficos;
+        $this->model->excel_ava_herramientas = $request->excel_ava_herramientas;
+        $this->model->power_point_cualidades = $request->power_point_cualidades;
+        $this->model->nuevas_tec_zoom = $request->nuevas_tec_zoom;
+      
+      "acc_institucionales_valores" => "on"
+      "acc_institucionales_metodologia" => "on"
+      "acc_institucionales_violencia" => "on"
+      "acc_institucionales_norma" => "on"
+      "acc_institucionales_actualizacion" => "on"
+      "acc_institucionales_politicas" => "on"
+      "acc_institucionales_protocolos" => "on"
+      "acc_des_humano_solucion" => "on"
+      "acc_des_humano_comunicacion" => "on"
+      "acc_des_humano_inteligencia" => "on"
+      "acc_administrativas_actualizacion" => "on"
+      "acc_administrativas_cumplimiento" => "on"
+      "acc_administrativas_administracion" => "on"
+      "acc_administrativas_clima" => "on"
+      "acc_administrativas_modernizacion" => "on"
+      "acc_administrativas_recursos" => "on"
+      "acc_administrativas_materiales" => "on"
+      "acc_administrativas_sistema" => "on"
+      "acc_administrativas_otro" => "on"
+      "otro_curso" => null
+      "interes_instructor" => "No"
+      "tema" => null
+      "activa" => null
+      "activao" => null
+      "fk_id_plantillas" => null
+      */
+    }
+    
 }

@@ -29,6 +29,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::prefix('admin')->group(function () {   
 
     Route::post('Dncsrepos/repo', 'App\Http\Controllers\admin\DncsController@dncsrepo');
+    Route::post('Dncs/search', 'App\Http\Controllers\admin\DncsController@search');
 
     Route::get('/repo/{action}', 'App\Http\Controllers\admin\DncsController@repo');
     Route::get('/exp/{action}', 'App\Http\Controllers\admin\DncsController@exp');
