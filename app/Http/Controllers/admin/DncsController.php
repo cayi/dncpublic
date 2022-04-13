@@ -19,6 +19,7 @@ class DncsController extends Controller
     {   
         return $this->dncsRepository->indexAdmin();
     }
+    // Menu del Capturista
     public function index()
     { 
         return $this->dncsRepository->indexdnc();      

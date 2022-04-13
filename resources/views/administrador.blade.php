@@ -10,6 +10,6 @@
     <div>Administración del Sistema: </div>
     <div>{{$usuario}} </div>
     <div>{{$email}}</div> 
-    <div>Verson 1.0.0, fecha 22/11/21</div> 
+    <div>Verson 1.0.0, fecha 13/04/2022</div> 
 </div>
 @endsection

@@ -140,7 +140,10 @@ class DncsRepository extends Controller
     }
     public function dependencias_de_plantillas()
     {                
-        return Plantillas::select('dependencia')->distinct()->get();
+        return Plantillas::select('dependencia')->
+            distinct()->
+            orderBy('dependencia','ASC')->
+            get();
     }
     public function all()
     {       
@@ -1280,7 +1283,7 @@ class DncsRepository extends Controller
             return view('/admin/Dncs/Import', compact('dncs','periodos')); }
         else { return $this->get_user_data(); }
     }
-    public function repo()
+    public function repo( $repo)
     {
         if ( $this->es_administrador() == "Si") { return $this->reportes( $repo); }
         else { return $this->get_user_data(); }
