@@ -13,146 +13,53 @@ class DncsController extends Controller
     {
         $this->dncsRepository = $dncsRepository;
         $this->middleware('auth');
-    }
-    
+    }    
     // Menu de Administrador
     public function indexAdmin()
     {   
-        return ( $this->dncsRepository->indexAdmin());
-    }
-
-    public function indexcrud()
-    {        
-        $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
-        $usuarios           = $this->dncsRepository->usuarios();
-        $periodos           = $this->dncsRepository->periodos();
-        $datos['dncs']      = $this->dncsRepository->all(); 
-        //dd($dependencias);
-        return view('admin/Dncs.index', $datos, compact(
-          'perfil_usuarios',
-          'periodos',
-          'usuarios'));      
-    }
-    public function indexblank()
-    {
-      $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
-      $usuarios           = $this->dncsRepository->usuarios();
-      $periodos           = $this->dncsRepository->periodos();
-      $dependencias       = $this->dncsRepository->dependencias_de_plantillas();
-      $dncs               = $this->dncsRepository->dncs_blank();
-      $dncs->fk_cve_periodo= "221";
-      //$dncs->num_emp
-      //print_r("num_emp".$dncs->num_emp);
-      //dd($dependencias);
-      return view('admin/Dncs.blank', compact(
-        'perfil_usuarios',
-        'periodos',
-        'usuarios',
-        'dependencias',
-        'dncs'
-      ));
+        return $this->dncsRepository->indexAdmin();
     }
     public function index()
     { 
-      //dd($this->dncsRepository->es_administrador());
-      if ( $this->dncsRepository->es_administrador() == "Si") 
-      { 
-        return $this->indexcrud();        
-      }
-      else 
-      {
-        return $this->indexblank();
-      }       
+        return $this->dncsRepository->indexdnc();      
     }
     public function create()
     {
-        $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
-        $usuarios           = $this->dncsRepository->usuarios();
-        $periodos           = $this->dncsRepository->periodos();
-        $dncs               = $this->dncsRepository->dncs_blank();
-        return view('admin/Dncs.create', compact(
-            'usuarios',
-            'perfil_usuarios',
-            'periodos',
-            'dncs'));
+        return $this->dncsRepository->create();
     }    
     // aqui brinca el boton de grabar
     public function store(Request $request)
-    {    
-        //dd($request);
-        $this->dncsRepository->insert( $request);
-        return redirect("/admin/Dncs")->with('mensaje','Nuevo Formato DNC Agergado.');
+    {         
+        return $this->dncsRepository->store( $request);
     }
     public function destroy( $id)
-    {
-        //dd("del");        
-        $this->dncsRepository->delete( $id);        
-        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Borrado.');
+    {     
+        return $this->dncsRepository->destroydnc( $id);
     }
     public function edit( $id)
-    {
-        //dd("he");
-        $perfil_usuarios    = $this->dncsRepository->perfil_usuarios();
-        $usuarios           = $this->dncsRepository->usuarios();
-        $periodos           = $this->dncsRepository->periodos();
-        $dncs               = $this->dncsRepository->edit( $id);
-        return view('admin/Dncs.edit', compact(
-            'usuarios',
-            'perfil_usuarios',
-            'periodos',
-            'dncs'));
+    {   
+        //dd("edit");     
+        return $this->dncsRepository->edit( $id);        
     }
     public function update(Request $request, $id)
-    {   
-        //dd("he");
-        $this->dncsRepository->save( $request, $id); 
-        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Actualizado.');
+    {           
+        return $this->dncsRepository->update( $request, $id);         
     }
     function import(Request $request)    
     {
-      if ( $this->dncsRepository->es_administrador() == "Si") 
-      {
-        return $this->dncsRepository->import( $request);
-      }
-      else
-      {        
-        return $this->dncsRepository->get_user_data();
-      }
+        return $this->dncsRepository->import( $request);      
     }
     function indeximport()
     { 
-      if ( $this->dncsRepository->es_administrador() == "Si") 
-      {
-          $periodos           = $this->dncsRepository->periodos();
-          $dncs               = $this->dncsRepository->all();          
-          return view('/admin/Dncs/Import', compact('dncs','periodos'));
-      }
-      else
-      {        
-        return $this->dncsRepository->get_user_data();        
-      }
+        return $this->dncsRepository->indeximport();
     }
     function repo( $repo)
     { 
-      if ( $this->dncsRepository->es_administrador() == "Si") 
-      {
-          return $this->dncsRepository->reportes( $repo);
-      }
-      else
-      {        
-        return $this->dncsRepository->get_user_data();        
-      }
+        return $this->dncsRepository->repo( $repo);
     }
     function exp( $exp)
     {
-        if ( $this->dncsRepository->es_administrador() == "Si") 
-        {
-          return $this->dncsRepository->export( $exp);
-        }
-        else
-        {        
-          return $this->dncsRepository->get_user_data();
-        }
+        return $this->dncsRepository->exp( $exp);        
     }
     function dncsrepo( Request $request)
     {
@@ -160,10 +67,10 @@ class DncsController extends Controller
     }
     public function Show(Request $request)
     { 
-      return $this->dncsRepository->Show( $request);      
+        return $this->dncsRepository->Show( $request);      
     } 
     public function search(Request $request)
     {
-      return $this->dncsRepository->search( $request);
+        return $this->dncsRepository->search( $request);
     }
 }

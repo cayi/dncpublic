@@ -38,11 +38,15 @@
 <input size="60" type="text" class="d-inline" class="form-control" 
     name="unidad_admva" id="unidad_admva" 
     value="{{ $dncs->unidad_admva }}">
-<br>
-<label class="d-inline" for="area"> Area:</label>
-<input size="60" type="text" class="d-inline" class="form-control" name="area" id="area" 
-    value="{{ $dncs->area }}">
 @include('include.dnc_cursos')
+<label for="activo"> Activo </label>
+<input onInput="jsactiva();" type="checkbox" id="activa" name="activa" 
+    value="{{ $dncs->activo }}"
+    <?php
+        if ($dncs->activo)   echo " checked " ;
+    ?>
+>
+<br>
 @include('include.grabarbtn')
 <a href="{{ url('/admin/Dncs') }}" class="btn btn-primary"  > Regresar </a>
 <br>

@@ -1,4 +1,8 @@
 <br>
+<label class="d-inline" for="area"> Area: </label>
+<input size="60" type="text" class="d-inline" class="form-control" name="area" id="area" 
+    value="{{ $dncs->area }}">
+<br>
 <label class="d-inline" for="grado_est"> Grado de Estudios: </label>
 <input size="60" type="text" class="d-inline" class="form-control" name="grado_est" id="grado_est" 
     value="{{ $dncs->grado_est }}">
@@ -78,14 +82,14 @@
     Funciones y herramientas avanzadas.
 </label>
 <br>
-<label class="d-inline" for="power_point"> Power Point: </label>
+<label class="d-inline" for="power_point_cualidades"> Power Point: </label>
 <label class="form-check-inline  fitem  ">
     <input type="checkbox" class="form-check-input "
     name="power_point_cualidades" id="power_point_cualidades" 
     <?php
         if ($dncs->power_point_cualidades) echo " checked "
     ?> >
-    Las Cualidades de la Presentaciones.
+    Las Cualidades de las Presentaciones.
 </label>
 <br>
 <label class="d-inline" ffor="nuevas_tec"> Nuevas Tecnologías: </label>
@@ -303,7 +307,7 @@
     <input type="checkbox" class="form-check-input "
     name="acc_des_humano_inteligencia" id="acc_des_humano_inteligencia" 
     <?php
-        if ($dncs->acc_des_humano_importancia) echo " checked "
+        if ($dncs->acc_des_humano_inteligencia) echo " checked "
     ?> >
     Inteligencia emocional.
 </label>
@@ -413,11 +417,4 @@
 <input class="d-inline" size="70" type="text" class="form-control" name="tema" id="tema"
     value="{{ $dncs->tema }}">
 <br>
-<label for="activo"> Activo </label>
-<input onInput="jsactiva();" type="checkbox" id="activa" name="activa" 
-    value="{{ $dncs->activo }}"
-<?php
-    if ($dncs->activo) echo " checked "
-?>
-> 
 <br>

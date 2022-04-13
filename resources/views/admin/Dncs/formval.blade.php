@@ -19,8 +19,6 @@
 <label class="d-inline" for="dep_o_ent"> Dependencia o Entidad: {{ $dncs->dep_o_ent }} </label>
 <br>
 <label class="d-inline" for="unidad_admva"> Unidad Administrativa: {{ $dncs->unidad_admva }}</label>
-<br>
-<label class="d-inline" for="area"> Area: {{ $dncs->area }}</label>
 @include('include.dnc_cursos')
 @include('include.grabarbtn')
 <a href="{{ url('/admin/Dncs') }}" class="btn btn-primary"  > Regresar </a>

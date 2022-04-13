@@ -10,7 +10,7 @@ class CreateDNCsTable extends Migration
     {
         Schema::create('dncs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('fk_id_plantillas');
+            $table->unsignedBigInteger('fk_id_plantillas')->default("1");
             $table->string('fk_cve_periodo',3)->default("211");
             $table->bigInteger('num_emp');
             //  nota los siguientes campos quedarian fuera una vez ligada a plantillas
