@@ -42,7 +42,7 @@
         <form action="{{ url('/admin/Periodos/'.$Periodo->id)}}" class="d-inline" method="post" enctype="multipart/form-data">
             @csrf
             {{ method_field('DELETE') }}
-            <input type="submit" onclick="return confirm('¿Quieres borrar?')" 
+            <input type="submit" onclick="return confirm('¿Quieres borrar el registro con ID={{$Periodo->id}}?')"
 	        value="Borrar" class="btn btn-danger">
         </form>
         </td>

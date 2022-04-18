@@ -3,7 +3,9 @@
 namespace App\Repositories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+
 
 // Necesario para la clase Session
 use Session;
@@ -17,19 +19,15 @@ use App\Models\Periodos;
 
 use App\Imports\PlantillasImport;
 
-use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Storage;
-
 class PlantillasRepository extends Controller
 {
-    //use WithFileUploads;
-
     private $model;
     public function __construct()
     {        
         $this->model = New Plantillas();
+        $this->model->actual = false;
     }    
-    // completa la vista del Usuario normal Evaluador!!
+    // completa la vista del Usuario normal
     public function index()
     {
         //dd("aqui");
@@ -72,21 +70,7 @@ class PlantillasRepository extends Controller
         //dd($plantillas);
          $vista= view('consideraciones',$datos);
          return $vista;
-    }
-    // completa la vista del Administrador!!
-    public function indexAdmin()
-    {
-        //dd("aqui");
-        $datos = [
-            "usuario"=>Auth::user()->name,
-            "cve_perfil_usuario"=>Auth::user()->fk_cve_perfil_usuario,
-            "email"=>Auth::user()->email,            
-            "success"=>""
-        ];
-        $datos['success']  = "Tenga cuidado con estas opciones";
-        $vista = view('administrador',$datos);     
-        return $vista;
-    }
+    }    
     public function perfil_usuarios()
     {
         return( Perfilusers::all()->SortBy('cve_perfil_usuario'));
@@ -101,7 +85,7 @@ class PlantillasRepository extends Controller
     }
     public function all()
     {   
-        return( $this->model->orderBy('num_emp', 'asc')->paginate(5));
+        return( $this->model->orderBy('id', 'asc')->paginate(5));
     }
     public function plantillas_blank(){
         $plantillas = Plantillas::FindOrFail(1);
@@ -120,16 +104,9 @@ class PlantillasRepository extends Controller
         $plantillas->tipo_org = "";
         $plantillas->num_plaza = "";
         $plantillas->activo = true;
+        $this->model = $plantillas;
         return ( $plantillas);
-    }
-    public function insert( Request $request)
-    {
-        $campos=        $this->get_campos_val();
-        $mensajes=      $this->get_mensajes_val();
-        $this->validate( $request, $campos, $mensajes);
-        $plantillas= $this->fix_datos_plantillas( $request);
-        $this->model->insert( $plantillas);
-    }
+    }    
     private function fix_datos_plantillas( $request) 
     {
         // elimina la variables _token , _method, y activao
@@ -185,7 +162,7 @@ class PlantillasRepository extends Controller
             'sexo.required'=>'El Sexo del Empleado debe especificarse, normalmente MASCULINO o FEMENINO con mayúsculas',
             'sexo.min'=>'El Sexo del Empleado debe tener al menos 1 caracter.',
             'sexo.max'=>'El Sexo del Empleado debe tener como máximo 10 caracteres.',
-            'nivel.required'=>'El Nivel debe especificarse, normalmente MASCULINO o FEMENINO',
+            'nivel.required'=>'El Nivel debe especificarse, normalmente 01A, 05I, 11C, etc.',
             'nivel.min'=>'El Nivel debe tener al menos 1 caracter.',
             'nivel.max'=>'El Nivel debe tener como máximo 5 caracteres.',
             'dependencia.required'=>'La Dependencia o Entidad debe especificarse',
@@ -215,9 +192,9 @@ class PlantillasRepository extends Controller
             'tipo_org.required'=>'El Tipo de Organismo debe especificarse',
             'tipo_org.min'=>'El Tipo de Organismo debe tener al menos 1 caracter.',
             'tipo_org.max'=>'El Tipo de Organismo debe tener como máximo 5 caracteres.',
-            'num_plaza.required'=>'El Tipo de Organismo debe especificarse',
-            'num_plaza.min'=>'El Tipo de Organismo debe tener al menos 1 caracter.',
-            'num_plaza.max'=>'El Tipo de Organismo debe tener como máximo 5 caracteres.',
+            'num_plaza.required'=>'El número de plaza debe especificarse',
+            'num_plaza.min'=>'El número de debe tener al menos 1 caracter.',
+            'num_plaza.max'=>'El número de debe tener como máximo 5 caracteres.',
         ];
         return $mensajes;
     }
@@ -272,29 +249,16 @@ class PlantillasRepository extends Controller
   }
   public function import3( Request $request)
     {
-        //dd("hey");
-        //$this->validate([ 'importFile' => 'required']);
-
         $this->importing = true;
         $this->importFilePath = storage_path('app').'/'.$request->file('select_file')->store('temp');
-        //dd($this);
-        
-        //(new PlantillasImport)->queue($this->importFilePath)
-        //Excel::queueImport((new PlantillasImport)->queue($this->importFilePath), $this->importFilePath);
-        //Excel::import(new PlantillasImport, $this->importFilePath);
         $batch = Bus::batch([
             new ImportJob($this->importFilePath),
         ])->dispatch();
-
-        $this->batchId = $batch->id;
-        //dd("hey");
+        $this->batchId = $batch->id;        
     }
   
   public function import_old( Request $request)
   {
-    // $datos= $this->get_user_data();
-    //ini_set('memory_limit', '-1');
-
     $this->validate($request, 
       [ 'select_file'  => 'required|mimes:xls,xlsx,csv'   ], 
       [ 'select_file.required'=>'Se pide un archivo de Excel con extensión .xls o .xlsx, o delimitado por comas csv' ]
@@ -303,8 +267,7 @@ class PlantillasRepository extends Controller
     $path = storage_path('app').'/'.$path1;
     if (strpos($path, "xls")) {
       return  $this->import_excel( $request, $path);
-    }
-    //dd($path);
+    }    
     try {
     
     } 
@@ -315,19 +278,12 @@ class PlantillasRepository extends Controller
   }
 
   public function import_excel( Request $request, $path)
-  {           
-    //dd("xls");
-      //dd($path1);
+  {               
       ini_set('memory_limit', '-1');
-      set_time_limit(1600);
-      //ini_set('max_execution_time', 120); 
-      //set_time_limit(0);
-      $data = Excel::toCollection(new PlantillasImport, $path); 
-      //dd($path1);
-      //$data = Excel::import(new PlantillasImport, $path);
+      set_time_limit(1600);      
+      $data = Excel::toCollection(new PlantillasImport, $path);       
       $existentes  = 0;
       $suma        = 0;
-      //dd( $data);
       if($data->count() > 0)
       {       
        foreach($data->toArray() as $key => $value)
@@ -357,18 +313,12 @@ class PlantillasRepository extends Controller
             "num_emp, nombre_completo, sexo, nivel, dependencia, unidad_admva, ".
             "puesto, municipio, plaza, tipo_plaza, fuente, plantilla, tipo_org, num_plaza. ".
             "Alguno de ellos esta faltando. ".
-            "Vea la documentación Técnica para importar Plantillas.";
-            //dd($msg);
-            //dd($row);
-            //return back()->with('success', $msg);
-          } // end if(!)
-          //dd( $data);
-          //dd($row);
+            "Vea la documentación Técnica para importar Plantillas.";            
+          } // end if(!)          
           $plantillas = DB::table('plantillas')
             ->where('num_emp',      $row['num_emp'])
             ->where('dependencia',  $row['dependencia'])
-            ->get();
-          //dd( $plantillas);
+            ->get();          
           if ( $plantillas->isNotEmpty()) 
           {
             $existentes= $existentes + 1;
@@ -408,10 +358,181 @@ class PlantillasRepository extends Controller
       } // end if($data)
       $msg = 'El archivo de Plantillas de Excel se subió con éxito. '.
       "Se repitieron ".$existentes." registro(s)".
-      " y se subieron ".$suma. " registro(s).";
-      //dd($msg);
-      return back()->with('success', $msg);      
-      //$data = Excel::import(new UsersImport,$path);
-      //return back()->with('success', 'El archivo de Uusarios de Excel se subió con éxito.');    
+      " y se subieron ".$suma. " registro(s)."; 
+      return back()->with('success', $msg);
   } 
+  private function request_to_model( $request)
+    {  
+        $this->model->num_emp = $request->num_emp;        
+        $this->model->nombre_completo = $request->nombre_completo;
+        $this->model->sexo = $request->sexo;
+        $this->model->nivel = $request->nivel;
+        $this->model->dependencia = $request->dependencia;
+        $this->model->unidad_admva = $request->unidad_admva;
+        $this->model->puesto = $request->puesto;
+        $this->model->municipio = $request->municipio;
+        $this->model->plaza = $request->plaza;
+        $this->model->tipo_plaza = $request->tipo_plaza;
+        $this->model->fuente = $request->fuente;
+        $this->model->plantilla = $request->plantilla;
+        $this->model->tipo_org = $request->tipo_org;
+        $this->model->num_plaza = $request->num_plaza;
+        $this->model->activo = $request->activo;
+    }        
+    private function model_to_session()
+    {
+        Session::forget('model');
+        Session::put('model', $this->model);
+    }
+    private function model_to_request()
+    {
+        $request = new Request();
+        $request->num_emp= $this->model->num_emp ;
+        $request->nombre_completo = $this->model->nombre_completo ;
+        $request->sexo = $this->model->sexo  ;
+        $request->nivel = $this->model->nivel  ;
+        $request->dependencia = $this->model->dependencia  ;
+        $request->unidad_admva = $this->model->unidad_admva  ;
+        $request->puesto = $this->model->puesto  ;
+        $request->municipio = $this->model->municipio ;
+        $request->plaza = $this->model->plaza  ;
+        $request->tipo_plaza = $this->model->tipo_plaza ;
+        $request->fuente = $this->model->fuente  ;
+        $request->plantilla = $this->model->plantilla  ;
+        $request->tipo_org = $this->model->tipo_org  ;
+        $request->num_plaza = $this->model->num_plaza  ;
+        $request->activo = $this->model->activo  ;
+        return $request;
+    }    
+    public function indexplantillas()
+    {           
+        $perfil_usuarios          = $this->perfil_usuarios();
+        $usuarios                 = $this->usuarios();
+        $periodos                 = $this->periodos();
+        $datos['plantillas']      = $this->all();         
+        return view('admin/Plantillas.index', $datos, compact(
+            'perfil_usuarios',
+            'periodos',
+            'usuarios'
+        ));
+    }    
+    public function store(Request $request)
+    {
+        //dd("store");
+        $this->insert( $request);
+        return redirect("/admin/Plantillas")->with('mensaje','Nueva Pantilla Agergada.');
+    }
+    public function destroy( $id)
+    {        
+        $this->delete( $id);        
+        return redirect("/admin/Plantillas")->with('mensaje','Plantilla Borrada.');
+    }
+    public function editplantillas( $id)
+    {
+        $perfil_usuarios    = $this->perfil_usuarios();
+        $usuarios           = $this->usuarios();
+        $plantillas         = $this->edit( $id);
+        return view('admin/Plantillas.edit', compact(
+            'usuarios',
+            'perfil_usuarios',
+            'plantillas'));
+    }
+    public function update(Request $request, $id)
+    {   
+        $this->save( $request, $id); 
+        return redirect("/admin/Plantillas")->with('mensaje','Plantilla Actualizada.');
+    }
+    public function importplantillas(Request $request)    
+    {      
+      if ( $this->es_administrador() == "Si")  { return $this->import( $request);
+      } else { return $this->get_user_data(); }
+    }
+    public function indeximport()
+    {      
+      if ( $this->es_administrador() == "Si") 
+      {
+          $periodos           = $this->periodos();
+          $plantillas         = $this->all();
+          $importing          = false;
+          $importFinished     = false;
+          return view('/admin/Plantillas/Import', compact(
+              'plantillas',
+              'importing',
+              'importFinished',
+              'periodos'
+            ));
+      }
+      else
+      {        
+        return $this->get_user_data();        
+      }
+    }
+    public function insert( Request $request)
+    {
+        $this->request_to_model( $request);
+        $this->model_to_session();        
+        $campos=        $this->get_campos_val();
+        $mensajes=      $this->get_mensajes_val();
+        //dd("val");
+        //$validated = $request->validate( $campos, $mensajes);
+        $validator = Validator::make($request->all(), $campos, $mensajes);
+        //dd("val");
+        //dd($validated);
+        if ($validator->fails()) {          
+              $ret= $this->Show();
+              //return redirect("/admin/Plantillas")->with('mensaje','Nueva Pantilla Agergada.');
+        }
+        $this->validate( $request, $campos, $mensajes);
+        $plantillas= $this->fix_datos_plantillas( $request);
+        $this->model->insert( $plantillas);
+    }
+    private function session_to_model()
+    {
+        $model = Session::get('model');
+        Session::forget('model');
+        $this->model->num_emp = $model['num_emp'];        
+        $this->model->nombre_completo = $model['nombre_completo'];
+        $this->model->sexo = $model['sexo'];
+        $this->model->nivel = $model['nivel'];
+        $this->model->dependencia = $model['dependencia'];
+        $this->model->unidad_admva = $model['unidad_admva'];
+        $this->model->puesto = $model['puesto'];
+        $this->model->municipio = $model['municipio'];
+        $this->model->plaza = $model['plaza'];
+        $this->model->tipo_plaza = $model['tipo_plaza'];
+        $this->model->fuente = $model['fuente'];
+        $this->model->plantilla = $model['plantilla'];
+        $this->model->tipo_org = $model['tipo_org'];
+        $this->model->num_plaza = $model['num_plaza'];
+        $this->model->activo = $model['activo'];
+        $this->model->actual = true;
+    }
+    public function Show()
+    {
+      if (Session::has('model')) { $this->session_to_model(); }            
+      return $this->createval();
+    }
+    public function create()
+    {
+      $perfil_usuarios    = $this->perfil_usuarios();
+      $usuarios           = $this->usuarios();     
+      $plantillas         = $this->plantillas_blank();       
+      return view('admin/Plantillas.create', compact(
+          'usuarios',
+          'perfil_usuarios',
+          'plantillas'));
+    }
+    public function createval()
+    {
+      //dd("hey");
+      $perfil_usuarios    = $this->perfil_usuarios();
+      $usuarios           = $this->usuarios();
+      $this->model->actual = false;
+      $plantillas = $this->model;
+      //dd($plantillas);
+      return view('admin/Plantillas.create', compact(
+          'usuarios',
+          'perfil_usuarios',
+          'plantillas'));
+    }
 }

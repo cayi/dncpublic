@@ -17,11 +17,13 @@ class DncsController extends Controller
     // Menu de Administrador
     public function indexAdmin()
     {   
+        //dd("indexAdmin");
         return $this->dncsRepository->indexAdmin();
     }
     // Menu del Capturista
     public function index()
     { 
+        //dd("idex cap");
         return $this->dncsRepository->indexdnc();      
     }
     public function create()
@@ -38,8 +40,7 @@ class DncsController extends Controller
         return $this->dncsRepository->destroydnc( $id);
     }
     public function edit( $id)
-    {   
-        //dd("edit");     
+    {           
         return $this->dncsRepository->edit( $id);        
     }
     public function update(Request $request, $id)
@@ -66,9 +67,9 @@ class DncsController extends Controller
     {
         return $this->dncsRepository->dncsrepo( $request);
     }
-    public function Show(Request $request)
-    { 
-        return $this->dncsRepository->Show( $request);      
+    public function Show()
+    {         
+        return $this->dncsRepository->Show();
     } 
     public function search(Request $request)
     {

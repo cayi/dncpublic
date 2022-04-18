@@ -175,8 +175,7 @@ class DncsRepository extends Controller
         $dncs->acc_administrativas= "";
         $this->model = $dncs;
         return ( $dncs);
-    }
-    
+    }   
     private function fix_datos_dncs( $request) 
     {
         // elimina la variables _token , _method, y activao
@@ -1069,6 +1068,7 @@ class DncsRepository extends Controller
     // no hereda Request
     public function Show()
     {
+        //dd("show repo");
         if ( $this->es_administrador() == "Si")  {  return redirect("/admin/Dncs/create"); }
         else
         {    
@@ -1274,7 +1274,6 @@ class DncsRepository extends Controller
         $request->fk_id_plantillas = $this->model->fk_id_plantillas ; 
         return $request;
     }
-    
     public function indeximport()
     {
         if ( $this->es_administrador() == "Si")  {

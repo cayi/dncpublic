@@ -2,16 +2,19 @@
 @include('include.formerrors')
 <br>
 <div class="form-group">
-<label for="periodo"> Periodo </label>
+<label for="periodo"> Clave del Periodo (de 1 a 3 caracteres) </label>
 <input type="text" class="form-control" name="cve_periodo" id="cve_periodo" 
     value="{{ $periodo->cve_periodo }}">
 <br>
+<label for="periodo"> Descripción del Periodo </label>
 <input type="text" class="form-control" name="descripcion" id="descripcion" 
     value="{{ $periodo->descripcion }}">
 <br>
+<label for="periodo"> Fecha Inicial </label>
 <input type="date" class="form-control" name="fecha_ini" id="fecha_ini" 
     value="{{ \Carbon\Carbon::createFromDate($periodo->fecha_ini)->format('Y-m-d') }}">
 <br>
+<label for="periodo"> Fecha Final </label>
 <input type="date" class="form-control" name="fecha_fin" id="fecha_fin" 
     value="{{ \Carbon\Carbon::createFromDate($periodo->fecha_fin)->format('Y-m-d') }}">
 <br>
