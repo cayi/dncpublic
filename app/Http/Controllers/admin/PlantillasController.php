@@ -41,7 +41,7 @@ class PlantillasController extends Controller
     }
     function import(Request $request)    
     {      
-        return  $this->plantillasRepository->importplantillas();
+        return  $this->plantillasRepository->importplantillas( $request);
     }
     function indeximport()
     {
