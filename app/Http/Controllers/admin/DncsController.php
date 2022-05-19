@@ -22,24 +22,23 @@ class DncsController extends Controller
     }
     // Menu del Capturista
     public function index()
-    { 
-        //dd("idex cap");
-        return $this->dncsRepository->indexdnc();      
+    {      
+        return $this->dncsRepository->index();
     }
-    public function create()
-    {
-        return $this->dncsRepository->create();
+    public function create( Request $request)
+    {        
+        return $this->dncsRepository->create( $request);
     }    
-    // aqui brinca el boton de grabar
+    // aqui brinca el boton de grabar, pero tambien el de confirmar
     public function store(Request $request)
-    {         
+    {        
         return $this->dncsRepository->store( $request);
     }
-    public function destroy( $id)
+    public function destroy(Request $request, $id)
     {     
-        return $this->dncsRepository->destroydnc( $id);
+        return $this->dncsRepository->destroy( $request, $id);
     }
-    public function edit( $id)
+    public function edit(Request $request, $id)
     {           
         return $this->dncsRepository->edit( $id);        
     }
@@ -51,28 +50,32 @@ class DncsController extends Controller
     {
         return $this->dncsRepository->import( $request);      
     }
-    function indeximport()
+    function indeximport( Request $request)
     { 
-        return $this->dncsRepository->indeximport();
+        return $this->dncsRepository->indeximport( $request);
     }
-    function repo( $repo)
+    function repo( Request $request, $repo)
     { 
-        return $this->dncsRepository->repo( $repo);
+        return $this->dncsRepository->repo( $request, $repo);
     }
-    function exp( $exp)
+    function exp( Request $request, $exp)
     {
-        return $this->dncsRepository->exp( $exp);        
+        return $this->dncsRepository->exp( $request, $exp);        
     }
     function dncsrepo( Request $request)
     {
         return $this->dncsRepository->dncsrepo( $request);
     }
-    public function Show()
+    public function show( Request $request)
     {         
-        return $this->dncsRepository->Show();
+        return $this->dncsRepository->show( $request);
     } 
     public function search(Request $request)
-    {
+    {    
         return $this->dncsRepository->search( $request);
+    }
+    public function searchtoo(Request $request)
+    {    
+        return $this->dncsRepository->searchtoo( $request);
     }
 }

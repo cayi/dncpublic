@@ -33,8 +33,266 @@ class DncsRepository extends Controller
             ->where('plantillas.id', '=', "1")
             ->get();
         $this->ultimo_periodo = $this->ultimo_periodo();
+    }
+    // completa la vista del Administrador, viene del controller
+    public function indexAdmin()
+    {
+        $datos = [
+            "usuario"=>Auth::user()->name,
+            "cve_perfil_usuario"=>Auth::user()->fk_cve_perfil_usuario,
+            "email"=>Auth::user()->email,            
+            "success"=>""
+        ];
+        $datos['success']  = "Tenga cuidado con estas opciones";
+        $vista = view('administrador',$datos);        
+        return $vista;
+    }
+    // viene del controller, menu capturista?
+    public function index()
+    { 
+      //dd($this->es_administrador());
+      if ( $this->es_administrador() == "Si")  {   return $this->indexcrud(); }
+      else  { return $this->consideraciones(); }       
+    }
+    // viene del controller
+    public function create( Request $request)
+    {
+        $perfil_usuarios    = $this->perfil_usuarios();
+        $usuarios           = $this->usuarios();
+        $periodos           = $this->periodos();
+        $dncs               = $this->dncs_blank();
+        return view('admin/Dncs.create', compact(
+            'usuarios',
+            'perfil_usuarios',
+            'periodos',
+            'dncs'));
+    }
+    // viene del controller, pero puede venir del boron guardar o de confirmar
+    public function store(Request $request)
+    {   
+        dd( $request); 
+        if ( $request->confirmar == "1") {} )
+        else {
+            $this->insert( $request);
+            return redirect("/admin/Dncs")->with('mensaje','Nuevo Formato DNC Agergado.');
+        }
+    } 
+    // viene del controller
+    public function destroy( Request $request, $id)
+    {
+        $this->model->destroy( $request, $id);
+        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Borrado.');
+    }
+    // viene del controller
+    public function edit( Request $request, $id)
+    {
+        $perfil_usuarios    = $this->perfil_usuarios();
+        $usuarios           = $this->usuarios();
+        $periodos           = $this->periodos();
+        $dncs               = $this->editdnc( $id);
+        //dd($dncs);
+        return view('admin/Dncs.edit', compact(
+            'usuarios',
+            'perfil_usuarios',
+            'periodos',
+            'dncs'));
+    }
+    // boton Grabar datos - Editar, viene del controller
+    public function update(Request $request, $id)
+    {
+        //dd($request);
+        $this->save( $request, $id); 
+        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Actualizado.');
+    }
+    // viene del controller
+    public function import(Request $request)
+    {
+      if ( $this->es_administrador() == "Si")   { return $this->importdnc( $request); }
+      else { return $this->get_user_data(); }
+    }
+    // viene del controller   
+    public function indeximport(Request $request)
+    {
+        if ( $this->es_administrador() == "Si")  {
+            $periodos           = $this->periodos();
+            $dncs               = $this->all();          
+            return view('/admin/Dncs/Import', compact('dncs','periodos')); }
+        else { return $this->get_user_data(); }
+    }
+    // viene del controller   
+    public function repo( Request $request, $repo)
+    {
+        if ( $this->es_administrador() == "Si") { return $this->reportes( $repo); }
+        else { return $this->get_user_data(); }
+    }
+    // viene del controller   
+    public function exp( Request $request, $exp)
+    {
+        if ( $this->es_administrador() == "Si")  { return $this->export( $exp); }
+        else { return $this->get_user_data(); }
+    }
+    // viene del controller   
+    public function dncsrepo( Request $request)
+    {
+        // clic en reporte detallado?
+        if (isset($request->repodet)) {
+            return $this->dncsrepodet( $request);
+        } else {
+            return $this->dncsrepodep( $request);            
+        }   
+    }   
+    // no hereda Request? viene del controller
+    public function show( Request $request)
+    {
+        //dd("show repo");
+        if ( $this->es_administrador() == "Si")  {  return redirect("/admin/Dncs/create"); }
+        else
+        {    
+            if (Session::has('model')) { $this->session_to_model(); }
+            $request = $this->model_to_request();
+            return $this->createval( $request);
+        }
     }    
-    public function get_user_data() 
+    // viene del controller
+    public function searchtoo(Request $request) 
+    {        
+        return $this->searchconfirm( $request);
+    }
+    // viene del controller
+    public function search(Request $request) 
+    {
+        return $this->indexblank();
+    }
+    private function searchconfirm(Request $request) 
+    {
+        $num_emp = trim($request->num_emp);
+        $dep_o_ent = trim($request->dependencia);
+        $plan = DB::table('plantillas')
+          ->orderBy('plantillas.num_emp', 'ASC')
+          ->where('plantillas.dependencia', '=', $dep_o_ent)
+          ->where('plantillas.num_emp', '=', $num_emp)
+          ->get();      
+        // SE ECNONTRÓ EN PLANTILLAS?
+        if( count($plan) > 0)
+        {        
+          $this->plantilla = $plan;
+          $this->model->fk_id_plantillas  = $this->plantilla[0]->id;
+          $this->model->num_emp           = $this->plantilla[0]->num_emp;
+          $this->model->nombre_completo   = $this->plantilla[0]->nombre_completo;
+          $this->model->dep_o_ent         = $this->plantilla[0]->dependencia;
+          $this->model->unidad_admva      = $this->plantilla[0]->unidad_admva;
+          $this->model_to_session();
+          return $this->createval2();
+        } else {  
+            //dd("not");
+            return $this->not_found( $num_emp, $dep_o_ent); }
+    }
+    private function not_found( $num_emp, $dep_o_ent) 
+    {
+        $msg = 'Empleado con numero = '.$num_emp. 
+            " y dependencia = ".$dep_o_ent .
+          ', no pudo ser localizado en plantillas.';
+            //dd($msg);
+            return redirect("/admin/search")
+                ->with('mensaje', $msg)
+                ->with('num_emp',$num_emp)
+                ->with('dep_o_ent',$dep_o_ent)
+            ;
+    }
+    private function search2(Request $request) 
+    {
+      $num_emp = trim($request->num_emp);
+      $dep_o_ent = trim($request->dependencia);
+      $plan = DB::table('plantillas')
+        ->orderBy('plantillas.num_emp', 'ASC')
+        ->where('plantillas.dependencia', '=', $dep_o_ent)
+        ->where('plantillas.num_emp', '=', $num_emp)
+        ->get();      
+      // SE ECNONTRÓ EN PLANTILLAS?
+      if( count($plan) > 0)
+      {        
+        $this->plantilla = $plan;
+        $this->model->fk_id_plantillas  = $this->plantilla[0]->id;
+        $this->model->num_emp           = $this->plantilla[0]->num_emp;
+        $this->model->nombre_completo   = $this->plantilla[0]->nombre_completo;
+        $this->model->dep_o_ent         = $this->plantilla[0]->dependencia;
+        $this->model->unidad_admva      = $this->plantilla[0]->unidad_admva;        
+        $udnc = DB::table('dncs')
+            ->orderBy('dncs.num_emp', 'ASC')
+            ->orderBy('dncs.fk_cve_periodo', 'DESC')
+            ->where('dncs.dep_o_ent', '=', $dep_o_ent)
+            ->where('dncs.deleted_at', '=', NULL)
+            ->where('dncs.num_emp', '=', $num_emp)
+            ->get();        
+        $this->model_to_session();
+        // existe ak menos 1 formato DNC        
+        if( count($udnc) > 0)
+        {                        
+            if( $udnc[0]->fk_cve_periodo == $this->ultimo_periodo->cve_periodo )
+            {                
+                $err = 
+                "Ya existe un formato capturado para el periodo ='". $this->ultimo_periodo->descripcion.
+                "' y empleado numero = '".$num_emp. 
+                "' y dependencia = '".$dep_o_ent. "'.";
+                return back()->with('mensaje', $err);
+            }
+            else
+            {
+                // pasa los datos de la ultimo formato dnc
+                $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
+                $this->model->area              = $udnc[0]->area;
+                $this->model->grado_est         = $udnc[0]->grado_est;
+                $this->model->correo            = $udnc[0]->correo;
+                $this->model->telefono          = $udnc[0]->telefono;
+                $this->model->funciones         = trim($udnc[0]->funciones);
+                // opcional los datos anteriores
+                $this->model->word_int          = $udnc[0]->word_int;
+                $this->model->word_ava          = $udnc[0]->word_ava;
+                $this->model->excel_int         = $udnc[0]->excel_int;
+                $this->model->excel_ava         = $udnc[0]->excel_ava;
+                $this->model->power_point       = $udnc[0]->power_point;
+                $this->model->nuevas_tec        = $udnc[0]->nuevas_tec;
+                $this->model->acc_institucionales       = $udnc[0]->acc_institucionales;
+                $this->model->acc_des_humano    = $udnc[0]->acc_des_humano;
+                $this->model->acc_administrativas   = $udnc[0]->acc_administrativas;
+                $this->model->otro_curso        = $udnc[0]->otro_curso;
+                $this->model->interes_instructor        = $udnc[0]->interes_instructor;
+                $this->model->tema              = $udnc[0]->tema;
+                $this->model->activo            = true;
+                $this->set_attributes();
+                // pone el ultimo periodo activo registrado
+                $this->model_to_session();                                
+                return $this->createval();
+            }
+        }
+        // no existe formato DNC        
+        $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
+        $this->model->area              = '';
+        $this->model->grado_est         = '';
+        $this->model->correo            = '';
+        $this->model->telefono          = '';
+        $this->model->funciones         = '';
+        // opcional los datos anteriores
+        $this->model->word_int          = '';
+        $this->model->word_ava          = '';
+        $this->model->excel_int         = '';
+        $this->model->excel_ava         = '';
+        $this->model->power_point       = '';
+        $this->model->nuevas_tec        = '';
+        $this->model->acc_institucionales       = '';
+        $this->model->acc_des_humano    = '';
+        $this->model->acc_administrativas   = '';
+        $this->model->otro_curso        = '';
+        $this->model->interes_instructor        = '';
+        $this->model->tema              = '';;
+        $this->model->activo            = true;
+        $this->model_to_session();        
+        return $this->createval();
+      }
+      // ELSE  if( count($plan) > 0), no se enocntr+o en plantilla
+      else  { return $thos->not_found( $num_emp, $dep_o_ent); }
+    }
+    private function get_user_data() 
     {
       $datos=[
         "usuario"=>Auth::user()->name,
@@ -43,7 +301,7 @@ class DncsRepository extends Controller
       ]; 
       return $datos;
     }
-    public function es_administrador() 
+    private function es_administrador() 
     {
       if (Auth::user()->fk_cve_perfil_usuario != "A") 
       {
@@ -52,7 +310,7 @@ class DncsRepository extends Controller
       return "Si";
     }
     // completa la vista del Usuario normal Evaluador!!
-    public function index()
+    private function indexdnc()
     {
         $datos = [
             "usuario"=>Auth::user()->name,
@@ -106,50 +364,37 @@ class DncsRepository extends Controller
         };
          $vista= view('consideraciones',$datos);
          return $vista;
-    }
-    // completa la vista del Administrador!!
-    public function indexAdmin()
-    {
-        $datos = [
-            "usuario"=>Auth::user()->name,
-            "cve_perfil_usuario"=>Auth::user()->fk_cve_perfil_usuario,
-            "email"=>Auth::user()->email,            
-            "success"=>""
-        ];
-        $datos['success']  = "Tenga cuidado con estas opciones";
-        $vista = view('administrador',$datos);        
-        return $vista;
-    }
-    public function perfil_usuarios()
+    }    
+    private function perfil_usuarios()
     {
         return( Perfilusers::all()->SortBy('cve_perfil_usuario'));
     }
-    public function usuarios()
+    private function usuarios()
     {        
         return( User::all()->SortBy('email'));
     }
-    public function periodos()
+    private function periodos()
     {        
         return( Periodos::all()->SortBy('cve_periodo'));
     }
-    public function ultimo_periodo()
+    private function ultimo_periodo()
     {                
         return( DB::table('periodos')->orderBy('id', 'desc')
         ->where('periodos.activo', '=', true)
         ->first());
     }
-    public function dependencias_de_plantillas()
+    private function dependencias_de_plantillas()
     {                
         return Plantillas::select('dependencia')->
             distinct()->
             orderBy('dependencia','ASC')->
             get();
     }
-    public function all()
+    private function all()
     {       
         return $this->model->orderBy('id', 'asc')->paginate(5);
     }
-    public function dncs_blank(){
+    private function dncs_blank(){
         $ult_per = $this->ultimo_periodo();         
         $dncs = Dncs::FindOrFail(1);
         // obtiene el ultimo periodo de la tabla
@@ -380,7 +625,7 @@ class DncsRepository extends Controller
         };        
         return ($datos_dncs);
     }
-    public function set_attributes()
+    private function set_attributes()
     {
         $arreglo = $this->model->getAttributes();
         //dd( $arreglo);
@@ -502,13 +747,13 @@ class DncsRepository extends Controller
             $this->model->setAttribute("acc_administrativas_otro","1");
         }
     }
-    public function editdnc( $id)
+    private function editdnc( $id)
     {        
         $this->model = $this->model->FindOrFail( $id);        
         $this->set_attributes();        
         return ( $this->model );
     }
-    public function save(Request $request, $id)
+    private function save(Request $request, $id)
     {
         $campos=        $this->get_campos_val();
         $mensajes=      $this->get_mensajes_val();
@@ -517,7 +762,7 @@ class DncsRepository extends Controller
         //dd($datos_dncs);
         $this->model->where('id', '=', $id)->update( $datos_dncs);
     }
-    public function get_campos_val()
+    private function get_campos_val()
     {
         $campos=[
             'fk_cve_periodo'=> 'required|string|max:3|min:1',
@@ -533,7 +778,7 @@ class DncsRepository extends Controller
         ];
         return $campos;
     }
-    public function get_mensajes_val()
+    private function get_mensajes_val()
     {
         $mensajes=[            
             'fk_cve_periodo.required'=>'El Periodo es requerido, debe contener al menos 1 caracter.',
@@ -569,7 +814,7 @@ class DncsRepository extends Controller
         ];
         return $mensajes;
     }    
-    public function importdnc(Request $request) 
+    private function importdnc(Request $request) 
     {
       $datos= $this->get_user_data();
       //dd("hey");          
@@ -701,7 +946,7 @@ class DncsRepository extends Controller
         } // end catch
       } // end else $clean == 'Limpiar'
     } // end import function   
-    public function export( $action) 
+    private function export( $action) 
     {
         if ($action== "1") {
             return Excel::download(new UsersExport, 'usuarios.xlsx');
@@ -714,7 +959,7 @@ class DncsRepository extends Controller
         }
         return ('Opción Inválida'); 
     }
-    public function reportes( $repo) 
+    private function reportes( $repo) 
     {
     $periodos           = $this->periodos();    
     if ($repo == "1")
@@ -730,23 +975,23 @@ class DncsRepository extends Controller
             return "En proceso reporte de Plantillas";
          }          
     }
-    public function dependencias()
+    private function dependencias()
     {           
         return Dncs::all()->sortBy("dep_o_ent")->unique("dep_o_ent");
     }
-    public function unidades()
+    private function unidades()
     {   
         return Dncs::all()->sortBy("unidad_admva")->unique("unidad_admva");
     }
-    public function areas()
+    private function areas()
     {   
         return Dncs::all()->sortBy("area")->unique("area");
     }
-    public function First()
+    private function First()
     {             
         return( $this->model->First());
     }
-    public function repo_dnc()
+    private function repo_dnc()
     {           
         $dncs =  $this->First();
         $dependencia = $this->dependencias();
@@ -769,7 +1014,7 @@ class DncsRepository extends Controller
             'area_ini','area_fin'
             ));        
     }     
-    public function dncsrepodet( Request $request)
+    private function dncsrepodet( Request $request)
     {
         if ($request->num_emp> "0") 
         {            
@@ -874,17 +1119,8 @@ class DncsRepository extends Controller
         {
             return view('admin/Dncsreporte',compact('dncs'));
         }
-    }
-    public function dncsrepo( Request $request)
-    {
-        // clic en reporte detallado?
-        if (isset($request->repodet)) {
-            return $this->dncsrepodet( $request);
-        } else {
-            return $this->dncsrepodep( $request);            
-        }   
-    }      
-    public function dncsrepodep( Request $request)
+    }   
+    private function dncsrepodep( Request $request)
     {
        $dncs = DB::table('dncs')
             ->where('dncs.fk_cve_periodo', '>=',$request->periodoini)
@@ -916,15 +1152,15 @@ class DncsRepository extends Controller
             return view('admin/Dncsrepodep',compact('dncs'));
         }
     }    
-    public function plantilla()
+    private function plantilla()
     {
         return $this->plantilla;
     }
-    public function get_model() 
+    private function get_model() 
     {
         return $this->model;
     }
-    public function searchmain()
+    private function searchmain()
     {
         if ($this->search($request)=="SI" ) {
             $perfil_usuarios    = $this->perfil_usuarios();
@@ -944,7 +1180,7 @@ class DncsRepository extends Controller
             return redirect("/admin/Dncs")->with('mensaje','Empleado no localizado.');
           }
     }
-    public function createval() 
+    private function createval() 
     {
         // otros datos
         $perfil_usuarios    = $this->perfil_usuarios();
@@ -961,125 +1197,23 @@ class DncsRepository extends Controller
             'dncs'
         ));      
     }
-    public function search(Request $request) 
+    private function createval2() 
     {
-      $num_emp = trim($request->num_emp);
-      $dep_o_ent = trim($request->dependencia);
-      $plan = DB::table('plantillas')
-        ->orderBy('plantillas.num_emp', 'ASC')
-        ->where('plantillas.dependencia', '=', $dep_o_ent)
-        ->where('plantillas.num_emp', '=', $num_emp)
-        ->get();      
-      // SE ECNONTRÓ EN PLANTILLAS?
-      if( count($plan) > 0)
-      {        
-        $this->plantilla = $plan;
-        $this->model->fk_id_plantillas  = $this->plantilla[0]->id;
-        $this->model->num_emp           = $this->plantilla[0]->num_emp;
-        $this->model->nombre_completo   = $this->plantilla[0]->nombre_completo;
-        $this->model->dep_o_ent         = $this->plantilla[0]->dependencia;
-        $this->model->unidad_admva      = $this->plantilla[0]->unidad_admva;        
-        $udnc = DB::table('dncs')
-            ->orderBy('dncs.num_emp', 'ASC')
-            ->orderBy('dncs.fk_cve_periodo', 'DESC')
-            ->where('dncs.dep_o_ent', '=', $dep_o_ent)
-            ->where('dncs.deleted_at', '=', NULL)
-            ->where('dncs.num_emp', '=', $num_emp)
-            ->get();        
-        $this->model_to_session();
-        // existe ak menos 1 formato DNC        
-        if( count($udnc) > 0)
-        {                        
-            if( $udnc[0]->fk_cve_periodo == $this->ultimo_periodo->cve_periodo )
-            {                
-                $err = 
-                "Ya existe un formato capturado para el periodo ='". $this->ultimo_periodo->descripcion.
-                "' y empleado numero = '".$num_emp. 
-                "' y dependencia = '".$dep_o_ent. "'.";
-                return back()->with('mensaje', $err);
-            }
-            else
-            {
-                // pasa los datos de la ultimo formato dnc
-                $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
-                $this->model->area              = $udnc[0]->area;
-                $this->model->grado_est         = $udnc[0]->grado_est;
-                $this->model->correo            = $udnc[0]->correo;
-                $this->model->telefono          = $udnc[0]->telefono;
-                $this->model->funciones         = trim($udnc[0]->funciones);
-                // opcional los datos anteriores
-                $this->model->word_int          = $udnc[0]->word_int;
-                $this->model->word_ava          = $udnc[0]->word_ava;
-                $this->model->excel_int         = $udnc[0]->excel_int;
-                $this->model->excel_ava         = $udnc[0]->excel_ava;
-                $this->model->power_point       = $udnc[0]->power_point;
-                $this->model->nuevas_tec        = $udnc[0]->nuevas_tec;
-                $this->model->acc_institucionales       = $udnc[0]->acc_institucionales;
-                $this->model->acc_des_humano    = $udnc[0]->acc_des_humano;
-                $this->model->acc_administrativas   = $udnc[0]->acc_administrativas;
-                $this->model->otro_curso        = $udnc[0]->otro_curso;
-                $this->model->interes_instructor        = $udnc[0]->interes_instructor;
-                $this->model->tema              = $udnc[0]->tema;
-                $this->model->activo            = true;
-                $this->set_attributes();
-                // pone el ultimo periodo activo registrado
-                $this->model_to_session();                                
-                return $this->createval();
-            }
-        }
-        // no existe formato DNC        
-        $this->model->fk_cve_periodo    = $this->ultimo_periodo->cve_periodo;
-        $this->model->area              = '';
-        $this->model->grado_est         = '';
-        $this->model->correo            = '';
-        $this->model->telefono          = '';
-        $this->model->funciones         = '';
-        // opcional los datos anteriores
-        $this->model->word_int          = '';
-        $this->model->word_ava          = '';
-        $this->model->excel_int         = '';
-        $this->model->excel_ava         = '';
-        $this->model->power_point       = '';
-        $this->model->nuevas_tec        = '';
-        $this->model->acc_institucionales       = '';
-        $this->model->acc_des_humano    = '';
-        $this->model->acc_administrativas   = '';
-        $this->model->otro_curso        = '';
-        $this->model->interes_instructor        = '';
-        $this->model->tema              = '';;
-        $this->model->activo            = true;
-        $this->model_to_session();        
-        return $this->createval();
-      }
-      // ELSE  if( count($plan) > 0), no se enocntr+o en plantilla
-      else  
-      {
-        $msg = 'Empleado con numero = '.$num_emp. 
-        " y dependencia = ".$dep_o_ent .
-        ', no pudo ser localizado en plantillas.';
-        //dd($msg);
-        return redirect("/admin/Dncs")
-            ->with('mensaje', $msg)
-            ->with('num_emp',$num_emp)
-            ->with('dep_o_ent',$dep_o_ent)
-            ;
-      }
-    }    
-    // no hereda Request
-    public function Show()
-    {
-        //dd("show repo");
-        if ( $this->es_administrador() == "Si")  {  return redirect("/admin/Dncs/create"); }
-        else
-        {    
-            if (Session::has('model'))
-            {            
-                $this->session_to_model();
-            }
-            $request = $this->model_to_request();
-            return $this->createval( $request);
-        }
-    }    
+        // otros datos
+        $perfil_usuarios    = $this->perfil_usuarios();
+        $usuarios           = $this->usuarios();
+        $periodos           = $this->periodos();
+        $des_uper           = $this->ultimo_periodo->descripcion;
+        // y agrega los datos de la plabtilla
+        $dncs               = $this->get_model();
+        return view('admin/Dncs.createval2', compact(
+            'des_uper',
+            'usuarios',
+            'perfil_usuarios',
+            'periodos',
+            'dncs'
+        ));      
+    }
     private function session_to_model()
     {
         $model = Session::get('model');
@@ -1209,7 +1343,7 @@ class DncsRepository extends Controller
         $this->model->fk_id_plantillas = $request->fk_id_plantillas;      
     }    
     // aqui brinca el boton de grabar/agregar
-    public function model_to_session()
+    private function model_to_session()
     {
         Session::forget('model');
         Session::put('model', $this->model);
@@ -1274,71 +1408,18 @@ class DncsRepository extends Controller
         $request->fk_id_plantillas = $this->model->fk_id_plantillas ; 
         return $request;
     }
-    public function indeximport()
+    private function consideraciones()
     {
-        if ( $this->es_administrador() == "Si")  {
-            $periodos           = $this->periodos();
-            $dncs               = $this->all();          
-            return view('/admin/Dncs/Import', compact('dncs','periodos')); }
-        else { return $this->get_user_data(); }
+        $datos = [
+            "usuario"=>Auth::user()->name,
+            "cve_perfil_usuario"=>Auth::user()->fk_cve_perfil_usuario,
+            "email"=>Auth::user()->email,
+            "success"=>""
+        ];
+        $vista= view('consideraciones',$datos);
+        return $vista;
     }
-    public function repo( $repo)
-    {
-        if ( $this->es_administrador() == "Si") { return $this->reportes( $repo); }
-        else { return $this->get_user_data(); }
-    }
-    public function exp( $exp)
-    {
-        if ( $this->es_administrador() == "Si")  { return $this->export( $exp); }
-        else { return $this->get_user_data(); }
-    }
-    public function import(Request $request)    
-    {
-      if ( $this->es_administrador() == "Si")   { return $this->importdnc( $request); }
-      else { return $this->get_user_data(); }
-    }    
-    public function edit( $id)
-    {
-        $perfil_usuarios    = $this->perfil_usuarios();
-        $usuarios           = $this->usuarios();
-        $periodos           = $this->periodos();
-        $dncs               = $this->editdnc( $id);
-        //dd($dncs);
-        return view('admin/Dncs.edit', compact(
-            'usuarios',
-            'perfil_usuarios',
-            'periodos',
-            'dncs'));
-    }
-    public function destroydnc( $id)
-    {
-        $this->model->destroy($id);
-        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Borrado.');
-    }
-    public function store(Request $request)
-    {    
-        $this->insert( $request);
-        return redirect("/admin/Dncs")->with('mensaje','Nuevo Formato DNC Agergado.');
-    }
-    public function create()
-    {
-        $perfil_usuarios    = $this->perfil_usuarios();
-        $usuarios           = $this->usuarios();
-        $periodos           = $this->periodos();
-        $dncs               = $this->dncs_blank();
-        return view('admin/Dncs.create', compact(
-            'usuarios',
-            'perfil_usuarios',
-            'periodos',
-            'dncs'));
-    }    
-    public function indexdnc()
-    { 
-      //dd($this->es_administrador());
-      if ( $this->es_administrador() == "Si")  {   return $this->indexcrud(); }
-      else  { return $this->indexblank(); }       
-    }
-    public function indexblank()
+    private function indexblank()
     {
       $perfil_usuarios    = $this->perfil_usuarios();
       $usuarios           = $this->usuarios();
@@ -1354,7 +1435,7 @@ class DncsRepository extends Controller
         'dncs'
       ));
     }
-    public function indexcrud()
+    private function indexcrud()
     {        
         $perfil_usuarios    = $this->perfil_usuarios();
         $usuarios           = $this->usuarios();
@@ -1366,7 +1447,7 @@ class DncsRepository extends Controller
           'usuarios'));      
     }
     // aqui brinca el boton de grabar/agregar
-    public function insert( Request $request)
+    private function insert( Request $request)
     {
         //dd($request);
         $this->request_to_model( $request);
@@ -1376,12 +1457,5 @@ class DncsRepository extends Controller
         $this->validate( $request, $campos, $mensajes);
         $dncs= $this->fix_datos_dncs( $request);
         $this->model->insert( $dncs);
-    }
-    // boton Grabar datos - Editar
-    public function update(Request $request, $id)
-    {
-        //dd($request);
-        $this->save( $request, $id); 
-        return redirect("/admin/Dncs")->with('mensaje','Formato DNC Actualizado.');
-    }
+    }   
 }

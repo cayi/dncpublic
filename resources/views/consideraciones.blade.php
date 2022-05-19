@@ -31,8 +31,8 @@ para lo cual deberá seguir los siguientes pasos:
 <br>&nbsp&nbsp&nbsp&nbsp1.&nbsp&nbsp<strong>Seleccionar</strong>&nbsp el Organismo o Dependencia a la cual esta adscrito a cada trabajador
 <br>&nbsp&nbsp&nbsp&nbsp2.&nbsp&nbsp<strong>Escribir</strong>&nbsp el número de empleado en el espacio correspondiente.
 <br>&nbsp&nbsp&nbsp&nbsp3.&nbsp&nbsp<strong>Dar clic</u></strong>&nbsp en el botón buscar.
-<br>&nbsp&nbsp&nbsp&nbsp4.&nbsp&nbsp<strong>Dar clic</strong>&nbsp en el boton Responder a la derecha de su nombre.
-<br>&nbsp&nbsp&nbsp&nbsp5.&nbsp&nbsp<strong>Llenar</strong>&nbsp el formulario.
+<br>&nbsp&nbsp&nbsp&nbsp4.&nbsp&nbsp<strong>Dar clic</strong>&nbsp en el boton Confirmar si sus datos estan correctos.
+<br>&nbsp&nbsp&nbsp&nbsp5.&nbsp&nbsp<strong>Llenar</strong>&nbsp el formulario, campo por campo.
 <br>&nbsp&nbsp&nbsp&nbsp7.&nbsp&nbsp<strong>Dar clic</strong>, en enviar formulario.
 <br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp Una vez enviado, le mostrará una ventana, copie el <strong>Folio</strong>
 ,anote en lugar seguro el folio generado.
@@ -43,7 +43,7 @@ para lo cual deberá seguir los siguientes pasos:
                mso-border-top-alt:solid windowtext .5pt;mso-border-top-alt:solid windowtext .5pt;
                mso-border-bottom-alt:solid windowtext .5pt;padding:0cm 3.5pt 0cm 3.5pt;                         
                height:17.35pt'>
-        <a href='/eva2' class="btn btn-primary">Continuar</a>
+        <a href='/admin/search' class="btn btn-primary">Continuar</a>
 </td>
 </tr>
 </div>
