@@ -1,5 +1,8 @@
 # Formato de Nececidades de Capacitacion (DNC)
 ## Proyecto Publico para elaborar un cuestionario para las necesidades de capacitación del Personal
+## Desarrollado en Laravel 9, PHP 8, con base de datos MariaDB con la idea que vaya creciendo paraobtener las necesidades de 
+## capacitación del presonal que labora en una empresa, en base a los resultados del cuestionario se podrá realizar
+## Un calendario mensual de cursos a impartir con la finalidad de cubir las necesidaded de capacitación del personal.
 ## Requisitos :
 
 Tener configurado o instalado en forma nativa o virtual en la plataforma del codigo fuente:
