@@ -1,7 +1,5 @@
-# Formato de Nececidades de Capacitacion (DNC) para el Centro de Capacitación CECAP
-
-## Proyecto Publico para elaborar un cuestionario para las necesidades de capacitaci+on del Personal
-
+# Formato de Nececidades de Capacitacion (DNC)
+## Proyecto Publico para elaborar un cuestionario para las necesidades de capacitación del Personal
 ## Requisitos :
 
 Tener configurado o instalado en forma nativa o virtual en la plataforma del codigo fuente:
@@ -59,7 +57,7 @@ Se intenta utilizar las mejores practicas como son:
  Uso de Repositorios
  Uso de Modelos
  Importacion y Exportacion de Datos con hojas de Excel
- 
+
 
   Es un proyecto EN DESARROLLO, algunas opciones aun no funcionan
  para ingresar usuario admin@gmail.com contraseña admin
@@ -173,7 +171,6 @@ Hacer click en la siguiente URL de acceso
 admin@gmail.com
 admin
 
-
 ## Notas adicionales
 Se intenta utilizar las mejores practicas como son:
 
@@ -183,7 +180,6 @@ Se intenta utilizar las mejores practicas como son:
  Uso de Modelos
  Importacion y Exportacion de Datos con hojas de Excel
 
- 
 
   Es un proyecto EN DESARROLLO, algunas opciones aun no funcionan
  para ingresar usuario admin@gmail.com contraseña admin
@@ -210,7 +206,6 @@ php artisan migrate:fresh
 Genera los registros de Usuario Administrador y uno de prueba
 php artisan db:seed
 
-
 ## running in heroku
 
 [Click Here](https://radiant-earth-84938.herokuapp.com)
@@ -221,6 +216,3 @@ php artisan db:seed
 
 `heroku run bash
 php artisan migrate:fresh  --seed
-
-
-
